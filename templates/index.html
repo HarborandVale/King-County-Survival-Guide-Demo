@@ -13,9 +13,9 @@
       --brand-border: rgba(255,255,255,0.12);
       --brand-text: #f2f2f7;
       --brand-muted: #b8b8d9;
-      --brand-primary: #9b6bff;   /* brighter neon purple */
-      --brand-accent: #ff71ce;    /* neon pink */
-      --brand-cyan: #01cdfe;      /* neon cyan */
+      --brand-primary: #9b6bff;
+      --brand-accent: #ff71ce;
+      --brand-cyan: #01cdfe;
       --shadow: 0 8px 28px rgba(0,0,0,.35);
     }
 
@@ -62,7 +62,7 @@
       background: linear-gradient(135deg, var(--brand-accent), var(--brand-cyan));
       color:#0b0c1e;
       font-weight:600;
-      white-space: nowrap; /* keep on one line */
+      white-space: nowrap;
     }
     button:hover{ filter: brightness(1.05); }
     button:active{ transform: translateY(1px); }
@@ -78,11 +78,10 @@
 
     .row{ display:flex; gap:12px; flex-wrap:wrap }
     .row > *{ flex:1 1 200px }
-    /* Keep Quick Actions buttons consistent size */
     .row > button { flex: 0 0 auto; }
 
     code{ background: rgba(255,255,255,0.08); padding:2px 6px; border-radius:6px; color: var(--brand-cyan); }
-    #output{ white-space: pre-wrap; display:none; } /* hidden until we need it */
+    #output{ white-space: pre-wrap; display:none; }
 
     .badge{
       display:inline-block; padding:2px 8px; border-radius:999px;
@@ -90,7 +89,6 @@
       font-size: 12px; margin-right:8px;
     }
 
-    /* Glow behind the hero */
     .hero { position: relative; }
     .glow {
       position: absolute; left: 50%; top: -20px; transform: translateX(-50%);
@@ -112,14 +110,24 @@
         <h1 style="margin:0">King County Survival Guide</h1>
         <p class="muted" style="margin:0">by Harbor &amp; Vale LLC</p>
       </div>
-      <span class="pill" style="margin-left:auto">Demo • Tier 1–3 skeleton</span>
+      <span class="pill" style="margin-left:auto">Demo • Tier 1–3 foundation</span>
     </header>
   </div>
 
-  <!-- Quick Actions (single block) -->
+  <!-- Safety & Respect (cultural competency microcopy) -->
+  <div class="card" aria-label="Safety and Respect">
+    <h2>Safety &amp; Respect</h2>
+    <ul>
+      <li>Use the name you prefer. Share only what you want—no sensitive health info needed here.</li>
+      <li>Affirming resources: we note walk-ins and inclusive services when possible.</li>
+      <li>Emergencies: call <strong>911</strong>. Mental health crisis: call/text <strong>988</strong>. General help: <strong>211</strong>.</li>
+    </ul>
+  </div>
+
+  <!-- Quick Actions -->
   <div class="card" id="quick-actions">
     <h2>Quick Actions</h2>
-    <div class="row">
+    <div class="row" role="group" aria-label="Actions">
       <button onclick="loadServices()">See Nearby Services</button>
       <button onclick="triage('I need housing')">AI: I need housing</button>
       <button onclick="triage('I need medical')">AI: I need medical</button>
@@ -129,31 +137,31 @@
 
     <!-- Search row -->
     <div class="row" style="margin-top:8px">
-      <input id="q" placeholder="Search services (e.g., showers, IDs, meals, transit)" />
+      <input id="q" placeholder="Search services (e.g., showers, IDs, meals, transit)" aria-label="Search services"/>
       <button onclick="loadServicesQuery()">Search</button>
       <button onclick="clearSearch()">Clear</button>
     </div>
-    <!-- Filters row: Neighborhood + Walk-in -->
-<div class="row" style="margin-top:8px">
-  <select id="hood">
-    <option value="">All neighborhoods</option>
-    <!-- options will be filled automatically -->
-  </select>
 
-  <label class="pill" style="display:flex;align-items:center;gap:6px">
-    <input id="walkin" type="checkbox" style="transform:translateY(1px)"> Walk-in only
-  </label>
+    <!-- Filters row -->
+    <div class="row" style="margin-top:8px">
+      <select id="hood" aria-label="Neighborhood">
+        <option value="">All neighborhoods</option>
+      </select>
 
-  <button onclick="applyFilters()">Apply filters</button>
-</div>
+      <label class="pill" style="display:flex;align-items:center;gap:6px">
+        <input id="walkin" type="checkbox" style="transform:translateY(1px)"> Walk-in only
+      </label>
 
+      <button onclick="applyFilters()">Apply filters</button>
+      <a href="/login" style="margin-left:auto"><button type="button" aria-label="Open dashboard login">Case dashboard</button></a>
+    </div>
 
     <!-- Loading indicator -->
     <div id="loading" class="pill" style="display:none;margin-top:8px">Loading…</div>
 
-    <p class="muted">Actions show functional flow only. For emergencies call 911; for crisis call/text 988; for general resources call 211.</p>
+    <p class="muted">Demo only. Buttons may log anonymous usage to improve services. For emergencies use 911; for crisis use 988; for general resources use 211.</p>
 
-    <!-- Results containers -->
+    <!-- Results -->
     <div id="cards"></div>
     <pre id="output" class="card"></pre>
   </div>
@@ -161,17 +169,17 @@
   <!-- Intake -->
   <div class="card">
     <h2>Contact / Intake (Demo)</h2>
-    <form id="demoForm" onsubmit="submitForm(event)">
+    <form id="demoForm" onsubmit="submitForm(event)" aria-label="Intake form">
       <div class="row">
-        <input name="name" placeholder="Your name (optional)" />
-        <input name="need" placeholder="What do you need? (e.g., housing, ID, meal)" />
+        <input name="name" placeholder="Your preferred name (optional)" aria-label="Preferred name"/>
+        <input name="need" placeholder="What do you need? (e.g., housing, ID, meal)" aria-label="Your need"/>
       </div>
-      <textarea name="details" rows="3" placeholder="Add any details you'd like…"></textarea>
+      <textarea name="details" rows="3" placeholder="Add any details you want to share (optional)" aria-label="Details"></textarea>
       <div style="margin-top:12px">
         <button type="submit">Submit</button>
       </div>
     </form>
-    <p class="muted">Sends a demo POST to <code>/submit_form</code> and shows a success message.</p>
+    <p class="muted">We don’t collect sensitive health information here. Submit shares a demo intake to the case dashboard queue.</p>
   </div>
 
   <footer class="muted" style="margin-top:28px;font-size:12px">
@@ -187,7 +195,7 @@
     if (el) { el.style.display = 'block'; el.textContent = JSON.stringify(data, null, 2); }
   };
 
-  // Show any JS errors in the output box (no silent failures)
+  // Show any JS errors in the output box
   window.onerror = function(msg, src, line, col, err){
     out({ js_error: String(msg), src, line, col, stack: err && err.stack });
     return false;
@@ -201,6 +209,17 @@
     el.textContent = msg || 'Loading…';
   }
 
+  // Track anonymous events (Tier 3)
+  async function track(type, name, meta){
+    try{
+      await fetch('/event', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ type, name, meta })
+      });
+    }catch(_){/* non-fatal */}
+  }
+
   // Render result cards with badges and actions
   function renderCards(list){
     const el = document.getElementById('cards');
@@ -212,6 +231,8 @@
       const tel  = s.phone ? `tel:${s.phone.replace(/[^+\d]/g,'')}` : null;
       const walk = s.walk_in ? `<span class="badge">Walk-in</span>` : ``;
       const hours = s.hours ? `<span class="badge">${s.hours}</span>` : ``;
+      const safeName = (s.name || '').replace(/'/g, "\\'");
+      const addrJS = (s.address || '').replace(/'/g, "\\'");
       return `
         <div class="card">
           <div style="margin-bottom:6px">${walk}${hours}</div>
@@ -219,20 +240,21 @@
           <p class="muted">${s.type || ''} • ${s.neighborhood || 'Seattle'}</p>
           ${s.notes ? `<p>${s.notes}</p>` : ''}
           <div class="row" style="margin-top:8px">
-            ${tel ? `<a href="${tel}"><button>Call</button></a>` : ''}
-            ${s.website ? `<a target="_blank" rel="noopener" href="${s.website}"><button>Website</button></a>` : ''}
-            <a target="_blank" rel="noopener" href="${maps}"><button>Directions</button></a>
-            ${s.address ? `<button onclick="copyAddr('${(s.address||'').replace(/'/g, "\\'")}')">Copy address</button>` : ''}
+            ${tel ? `<a href="${tel}" onclick="track('call_click','${safeName}',{})"><button aria-label="Call ${safeName}">Call</button></a>` : ''}
+            ${s.website ? `<a target="_blank" rel="noopener" href="${s.website}" onclick="track('website_click','${safeName}',{})"><button aria-label="Open website for ${safeName}">Website</button></a>` : ''}
+            <a target="_blank" rel="noopener" href="${maps}" onclick="track('directions_click','${safeName}',{})"><button aria-label="Directions to ${safeName}">Directions</button></a>
+            ${s.address ? `<button onclick="copyAddr('${addrJS}','${safeName}')">Copy address</button>` : ''}
           </div>
         </div>
       `;
     }).join('');
   }
 
-  function copyAddr(addr){
+  function copyAddr(addr, name){
     try{
       navigator.clipboard.writeText(addr);
       setLoading(true, 'Address copied'); setTimeout(()=>setLoading(false), 700);
+      track('copy_address', name, {});
     }catch(e){
       out({error:'Clipboard failed', detail:String(e)});
     }
@@ -245,6 +267,7 @@
       const res = await fetch('/services', { cache: 'no-store' });
       const data = await res.json();
       renderCards(data);
+      track('filter', 'all', {});
     }catch(e){
       out({ error: String(e) });
     }finally{
@@ -252,7 +275,7 @@
     }
   }
 
-  // Filter by type, with a retry for hobby-tier hiccups
+  // Filter by type, with retry for hobby-tier hiccups
   async function loadServicesFiltered(kind){
     setLoading(true, `Filtering: ${kind}`);
     try{
@@ -262,7 +285,7 @@
         res = await fetch('/services?type=' + encodeURIComponent(kind), { cache: 'no-store' });
       }
       const txt = await res.text();
-      try { renderCards(JSON.parse(txt)); }
+      try { renderCards(JSON.parse(txt)); track('filter', kind, {}); }
       catch (parseErr) { out({ error: 'Failed to parse JSON', status: res.status, raw: txt.slice(0, 400) }); }
     }catch(e){
       out({ error: String(e) });
@@ -271,7 +294,7 @@
     }
   }
 
-  // Keyword search (with synonyms handled on the server)
+  // Keyword search (server handles synonyms)
   async function loadServicesQuery(){
     const term = (document.getElementById('q')?.value || '').trim();
     setLoading(true, term ? `Searching: ${term}` : 'Loading services…');
@@ -283,7 +306,7 @@
         res = await fetch(url, { cache: 'no-store' });
       }
       const txt = await res.text();
-      try { renderCards(JSON.parse(txt)); }
+      try { renderCards(JSON.parse(txt)); track('search', term || 'all', {}); }
       catch (parseErr) { out({ error: 'Failed to parse JSON', status: res.status, raw: txt.slice(0, 400) }); }
     }catch(e){
       out({ error: String(e) });
@@ -297,52 +320,8 @@
     document.getElementById('cards').innerHTML = '';
     document.getElementById('output').style.display = 'none';
   }
-<!-- Build filters from the controls and fetch -->
-async function applyFilters(){
-  const hood = (document.getElementById('hood')?.value || '').trim();
-  const walk = document.getElementById('walkin')?.checked ? 'true' : '';
 
-  let url = '/services';
-  const params = [];
-  if (hood) params.push('neighborhood=' + encodeURIComponent(hood));
-  if (walk) params.push('walk_in=true');
-  if (params.length) url += '?' + params.join('&');
-
-  setLoading(true, params.length ? 'Applying filters…' : 'Loading services…');
-  try{
-    let res = await fetch(url, { cache: 'no-store' });
-    if (!res.ok) {
-      await new Promise(r => setTimeout(r, 600));
-      res = await fetch(url, { cache: 'no-store' });
-    }
-    const txt = await res.text();
-    try { renderCards(JSON.parse(txt)); }
-    catch (parseErr) { out({ error: 'Failed to parse JSON', status: res.status, raw: txt.slice(0, 400) }); }
-  }catch(e){
-    out({ error: String(e) });
-  }finally{
-    setLoading(false);
-  }
-}
-
-/* Populate the Neighborhood dropdown from the service data */
-async function populateNeighborhoods(){
-  try{
-    const select = document.getElementById('hood');
-    if (!select) return;
-    const res = await fetch('/services', { cache: 'no-store' });
-    const data = await res.json();
-    const uniq = Array.from(new Set((data || []).map(s => s.neighborhood).filter(Boolean))).sort();
-    const opts = uniq.map(n => `<option value="${n}">${n}</option>`).join('');
-    const first = select.querySelector('option')?.outerHTML || '<option value="">All neighborhoods</option>';
-    select.innerHTML = first + opts;
-  }catch(e){ /* non-fatal */ }
-}
-
-/* Run on page load */
-document.addEventListener('DOMContentLoaded', populateNeighborhoods);
-
-  // AI triage (robust parsing + loading)
+  // AI triage (with event logging)
   async function triage(message){
     setLoading(true, 'Thinking…');
     try{
@@ -352,7 +331,7 @@ document.addEventListener('DOMContentLoaded', populateNeighborhoods);
         body: JSON.stringify({ message })
       });
       const txt = await res.text();
-      try { out(JSON.parse(txt)); }
+      try { out(JSON.parse(txt)); /* server logs event */ }
       catch (parseErr) { out({ error: String(parseErr), status: res.status, raw: txt.slice(0, 300) }); }
     } catch(e){
       out({ error: String(e) });
@@ -361,12 +340,55 @@ document.addEventListener('DOMContentLoaded', populateNeighborhoods);
     }
   }
 
+  // Apply Neighborhood + Walk-in filters
+  async function applyFilters(){
+    const hood = (document.getElementById('hood')?.value || '').trim();
+    const walk = document.getElementById('walkin')?.checked ? 'true' : '';
+    let url = '/services';
+    const params = [];
+    if (hood) params.push('neighborhood=' + encodeURIComponent(hood));
+    if (walk) params.push('walk_in=true');
+    if (params.length) url += '?' + params.join('&');
+
+    setLoading(true, params.length ? 'Applying filters…' : 'Loading services…');
+    try{
+      let res = await fetch(url, { cache: 'no-store' });
+      if (!res.ok) {
+        await new Promise(r => setTimeout(r, 600));
+        res = await fetch(url, { cache: 'no-store' });
+      }
+      const txt = await res.text();
+      try { renderCards(JSON.parse(txt)); track('filter', params.join('&') || 'all', {}); }
+      catch (parseErr) { out({ error: 'Failed to parse JSON', status: res.status, raw: txt.slice(0, 400) }); }
+    }catch(e){
+      out({ error: String(e) });
+    }finally{
+      setLoading(false);
+    }
+  }
+
+  // Populate Neighborhood dropdown on load
+  async function populateNeighborhoods(){
+    try{
+      const select = document.getElementById('hood');
+      if (!select) return;
+      const res = await fetch('/services', { cache: 'no-store' });
+      const data = await res.json();
+      const uniq = Array.from(new Set((data || []).map(s => s.neighborhood).filter(Boolean))).sort();
+      const opts = uniq.map(n => `<option value="${n}">${n}</option>`).join('');
+      const first = '<option value="">All neighborhoods</option>';
+      select.innerHTML = first + opts;
+    }catch(e){ /* non-fatal */ }
+  }
+  document.addEventListener('DOMContentLoaded', populateNeighborhoods);
+
   // Demo form submit
   async function submitForm(e){
     e.preventDefault();
     const form = new FormData(document.getElementById('demoForm'));
     const res = await fetch('/submit_form',{ method:'POST', body: form });
-    out(await res.json());
+    const data = await res.json();
+    out(data);
   }
 
   // Enter submits search
