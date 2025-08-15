@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Guided Intake (Beta) – King County Survival Guide</title>
+  <style>
+    body{font-family:system-ui,Arial,sans-serif;color:#f2f2f7;background:#0b0c1e;
+         background: radial-gradient(900px 600px at 20% -10%, #2a1b59 0%, transparent 60%),
+                     radial-gradient(800px 600px at 120% 20%, #0b3d91 0%, transparent 55%),
+                     linear-gradient(180deg, #0b0c1e 0%, #1a1540 100%);
+         max-width:900px;margin:24px auto;padding:0 16px;line-height:1.5}
+    .card{border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:16px;margin:12px 0;background:rgba(255,255,255,.06)}
+    h1,h2,h3{margin:8px 0}
+    label{display:block;margin:8px 0 4px}
+    input,select,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#f2f2f7}
+    .row{display:flex;gap:12px;flex-wrap:wrap}.row>*{flex:1 1 200px}
+    button{padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.2);cursor:pointer;background:linear-gradient(135deg,#ff71ce,#01cdfe);color:#0b0c1e;font-weight:600}
+    .muted{color:#b8b8d9}
+    .pill{font-size:12px;border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:4px 10px;color:#b8b8d9;background:rgba(255,255,255,.06)}
+    #cards .card{background:rgba(255,255,255,.08)}
+  </style>
+</head>
+<body>
+  <h1>Guided Intake (Beta)</h1>
+  <p class="muted">Answer a few optional questions. We’ll suggest services based on what you share. No sensitive health info required.</p>
+
+  <div class="card">
+    <div class="row">
+      <div>
+        <label>Primary need</label>
+        <select id="need">
+          <option value="">Choose…</option>
+          <option>Housing / Shelter</option>
+          <option>Medical care</option>
+          <option>ID / Documents</option>
+          <option>Food / Meals</option>
+          <option>Hygiene (showers/laundry)</option>
+          <option>Detox / Substance</option>
+          <option>Mental health (non-crisis)</option>
+        </select>
+      </div>
+      <div>
+        <label>Urgency</label>
+        <select id="urgency">
+          <option value="">Choose…</option>
+          <option>Tonight</option>
+          <option>This week</option>
+          <option>Flexible</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Neighborhood</label>
+        <select id="hood"><option value="">All neighborhoods</option></select>
+      </div>
+      <div>
+        <label class="pill" style="display:flex;align-items:center;gap:6px">
+          <input id="walkin" type="checkbox" style="transform:translateY(1px)"> Walk-in only
+        </label>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>With children?</label>
+        <select id="children">
+          <option value="">Prefer not to say</option>
+          <option>No</option>
+          <option>Yes</option>
+        </select>
+      </div>
+      <div>
+        <label>Veteran?</label>
+        <select id="veteran">
+          <option value="">Prefer not to say</option>
+          <option>No</option>
+          <option>Yes</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row">
+      <input id="pronouns" placeholder="Pronouns (optional)"/>
+      <input id="contact" placeholder="Preferred contact (optional)"/>
+    </div>
+
+    <div style="margin-top:12px">
+      <button onclick="suggest()">See suggestions</button>
+      <a href="/"><button type="button">Back</button></a>
+      <span id="loading" class
