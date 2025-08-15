@@ -5,30 +5,40 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Guided Intake (Beta) – King County Survival Guide</title>
   <style>
-    body{font-family:system-ui,Arial,sans-serif;color:#f2f2f7;background:#0b0c1e;
+    body{font-family:system-ui,Arial,sans-serif;color:#f2f2f7;
          background: radial-gradient(900px 600px at 20% -10%, #2a1b59 0%, transparent 60%),
                      radial-gradient(800px 600px at 120% 20%, #0b3d91 0%, transparent 55%),
                      linear-gradient(180deg, #0b0c1e 0%, #1a1540 100%);
          max-width:900px;margin:24px auto;padding:0 16px;line-height:1.5}
-    .card{border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:16px;margin:12px 0;background:rgba(255,255,255,.06)}
+    .card{border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:16px;margin:12px 0;background:rgba(255,255,255,.06);box-shadow:0 8px 28px rgba(0,0,0,.35)}
     h1,h2,h3{margin:8px 0}
     label{display:block;margin:8px 0 4px}
     input,select,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#f2f2f7}
     .row{display:flex;gap:12px;flex-wrap:wrap}.row>*{flex:1 1 200px}
-    button{padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.2);cursor:pointer;background:linear-gradient(135deg,#ff71ce,#01cdfe);color:#0b0c1e;font-weight:600}
+    button{padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.2);cursor:pointer;background:linear-gradient(135deg,#ff71ce,#01cdfe);color:#0b0c1e;font-weight:600;white-space:nowrap}
+    button:hover{filter:brightness(1.05)}
     .muted{color:#b8b8d9}
     .pill{font-size:12px;border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:4px 10px;color:#b8b8d9;background:rgba(255,255,255,.06)}
+    .badge{display:inline-block;padding:2px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);font-size:12px;margin-right:8px}
     #cards .card{background:rgba(255,255,255,.08)}
+    #output{white-space:pre-wrap;display:none}
   </style>
 </head>
 <body>
-  <h1>Guided Intake (Beta)</h1>
-  <p class="muted">Answer a few optional questions. We’ll suggest services based on what you share. No sensitive health info required.</p>
+  <header class="row" style="align-items:center">
+    <div>
+      <h1 style="margin:0">Guided Intake (Beta)</h1>
+      <p class="muted" style="margin:4px 0 0 0">Answer a few optional questions. We’ll suggest services based on what you share. No sensitive health info required.</p>
+    </div>
+    <div style="flex:0 0 auto">
+      <a href="/" style="text-decoration:none"><button type="button">← Back to Guide</button></a>
+    </div>
+  </header>
 
   <div class="card">
     <div class="row">
       <div>
-        <label>Primary need</label>
+        <label for="need">Primary need</label>
         <select id="need">
           <option value="">Choose…</option>
           <option>Housing / Shelter</option>
@@ -41,7 +51,7 @@
         </select>
       </div>
       <div>
-        <label>Urgency</label>
+        <label for="urgency">Urgency</label>
         <select id="urgency">
           <option value="">Choose…</option>
           <option>Tonight</option>
@@ -53,11 +63,11 @@
 
     <div class="row">
       <div>
-        <label>Neighborhood</label>
+        <label for="hood">Neighborhood</label>
         <select id="hood"><option value="">All neighborhoods</option></select>
       </div>
       <div>
-        <label class="pill" style="display:flex;align-items:center;gap:6px">
+        <label class="pill" style="display:flex;align-items:center;gap:6px;margin-top:28px">
           <input id="walkin" type="checkbox" style="transform:translateY(1px)"> Walk-in only
         </label>
       </div>
@@ -65,7 +75,7 @@
 
     <div class="row">
       <div>
-        <label>With children?</label>
+        <label for="children">With children?</label>
         <select id="children">
           <option value="">Prefer not to say</option>
           <option>No</option>
@@ -73,7 +83,7 @@
         </select>
       </div>
       <div>
-        <label>Veteran?</label>
+        <label for="veteran">Veteran?</label>
         <select id="veteran">
           <option value="">Prefer not to say</option>
           <option>No</option>
@@ -83,11 +93,99 @@
     </div>
 
     <div class="row">
-      <input id="pronouns" placeholder="Pronouns (optional)"/>
+      <input id="prefname" placeholder="Your preferred name (optional)"/>
       <input id="contact" placeholder="Preferred contact (optional)"/>
     </div>
 
-    <div style="margin-top:12px">
+    <div style="margin-top:12px" class="row">
       <button onclick="suggest()">See suggestions</button>
-      <a href="/"><button type="button">Back</button></a>
-      <span id="loading" class
+      <button onclick="clearSuggestions()" type="button">Clear</button>
+      <span id="loading" class="pill" style="display:none">Loading…</span>
+    </div>
+    <p class="muted" style="margin-top:8px">Tip: If urgency is “Tonight,” checking “Walk-in only” usually helps.</p>
+  </div>
+
+  <div id="cards"></div>
+  <pre id="output" class="card"></pre>
+
+<script>
+  // Minimal tracker (matches /event in app.py)
+  async function track(type, name, meta){
+    try{
+      await fetch('/event', { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ type, name, meta }) });
+    }catch(_){}
+  }
+
+  function setLoading(on, msg){
+    const el = document.getElementById('loading');
+    if (!el) return;
+    el.style.display = on ? 'inline-block' : 'none';
+    el.textContent = msg || 'Loading…';
+  }
+
+  const out = (data) => {
+    const el = document.getElementById('output');
+    if (!el) return;
+    el.style.display = 'block';
+    el.textContent = JSON.stringify(data, null, 2);
+  };
+
+  // Map “Primary need” to query params for /services
+  function needToQuery(need){
+    switch((need || '').toLowerCase()){
+      case 'housing / shelter':        return { type: 'Shelter' };
+      case 'medical care':             return { type: 'Clinic' };
+      case 'id / documents':           return { q: 'id' };              // uses synonyms server-side
+      case 'food / meals':             return { type: 'Food Bank' };
+      case 'hygiene (showers/laundry)':return { q: 'showers' };
+      case 'detox / substance':        return { type: 'Detox' };
+      case 'mental health (non-crisis)':return { q: 'mental' };
+      default:                         return {};
+    }
+  }
+
+  function renderCards(list){
+    const el = document.getElementById('cards');
+    if (!Array.isArray(list)) { out({error:"Expected array", got: typeof list}); return; }
+    el.innerHTML = list.map(s => {
+      const maps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.address || s.name)}`;
+      const tel  = s.phone ? `tel:${s.phone.replace(/[^+\d]/g,'')}` : null;
+      const walk = s.walk_in ? `<span class="badge">Walk-in</span>` : ``;
+      const hours = s.hours ? `<span class="badge">${s.hours}</span>` : ``;
+      const safeName = (s.name || '').replace(/'/g, "\\'");
+      const addrJS = (s.address || '').replace(/'/g, "\\'");
+      return `
+        <div class="card">
+          <div style="margin-bottom:6px">${walk}${hours}</div>
+          <h3 style="margin:0 0 4px 0">${s.name}</h3>
+          <p class="muted">${s.type || ''} • ${s.neighborhood || 'Seattle'}</p>
+          ${s.notes ? `<p>${s.notes}</p>` : ''}
+          <div class="row" style="margin-top:8px">
+            ${tel ? `<a href="${tel}" onclick="track('call_click','${safeName}',{})"><button aria-label="Call ${safeName}">Call</button></a>` : ''}
+            ${s.website ? `<a target="_blank" rel="noopener" href="${s.website}" onclick="track('website_click','${safeName}',{})"><button aria-label="Open website for ${safeName}">Website</button></a>` : ''}
+            <a target="_blank" rel="noopener" href="${maps}" onclick="track('directions_click','${safeName}',{})"><button aria-label="Directions to ${safeName}">Directions</button></a>
+            ${s.address ? `<button onclick="copyAddr('${addrJS}','${safeName}')">Copy address</button>` : ''}
+            <button onclick="referService('${safeName}')">Add to queue</button>
+          </div>
+        </div>
+      `;
+    }).join('') || `<div class="card"><p class="muted">No matching results. Try removing a filter or choosing a different need.</p></div>`;
+  }
+
+  function copyAddr(addr, name){
+    try{
+      navigator.clipboard.writeText(addr);
+      setLoading(true, 'Address copied'); setTimeout(()=>setLoading(false), 700);
+      track('copy_address', name, {});
+    }catch(e){ out({error:'Clipboard failed', detail:String(e)}); }
+  }
+
+  async function referService(serviceName){
+    setLoading(true, 'Adding to queue…');
+    try{
+      const clientName = document.getElementById('prefname')?.value || '';
+      await fetch('/refer', { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ service: serviceName, client_name: clientName }) });
+      track('filter', 'refer', { service: serviceName, page: 'guided' });
+      setLoading(true, 'Added to queue
