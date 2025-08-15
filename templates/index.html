@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Harbor & Vale Concierge (Demo)</title>
+  <style>
+    body{font-family:system-ui,Arial,sans-serif;max-width:720px;margin:24px auto;padding:0 16px;line-height:1.45}
+    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+    .pill{font-size:12px;border:1px solid #ddd;border-radius:999px;padding:4px 10px}
+    .card{border:1px solid #eee;border-radius:12px;padding:16px;margin:12px 0;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+    button{padding:10px 14px;border-radius:10px;border:1px solid #ddd;cursor:pointer}
+    input,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid #ddd}
+    .row{display:flex;gap:12px;flex-wrap:wrap}
+    .row > *{flex:1 1 200px}
+    .muted{color:#666}
+    footer{margin-top:28px;font-size:12px;color:#777}
+    code{background:#f7f7f7;padding:2px 6px;border-radius:6px}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Harbor & Vale Concierge</h1>
+    <span class="pill">Demo • Tier 1–3 skeleton</span>
+  </header>
+
+  <div class="card">
+    <h2>Quick Actions</h2>
+    <div class="row">
+      <button onclick="loadServices()">See Nearby Services</button>
+      <button onclick="triage('I need housing')">AI: I need housing</button>
+      <button onclick="triage('I have a medical issue')">AI: I need medical</button>
+    </div>
+    <p class="muted">These are demo endpoints to show flow. No real data yet.</p>
+    <pre id="output" class="card" style="white-space:pre-wrap"></pre>
+  </div>
+
+  <div class="card">
+    <h2>Contact / Intake (Demo)</h2>
+    <form id="demoForm" onsubmit="submitForm(event)">
+      <div class="row">
+        <input name="name" placeholder="Your name (optional)" />
+        <input name="need" placeholder="What do you need? (e.g., housing, ID, meal)" />
+      </div>
+      <textarea name="details" rows="3" placeholder="Add any details you'd like…"></textarea>
+      <div style="margin-top:12px">
+        <button type="submit">Submit</button>
+      </div>
+    </form>
+    <p class="muted">Sends a demo POST to <code>/submit_form</code> and shows a success message.</p>
+  </div>
+
+  <footer>
+    © Harbor & Vale LLC — demo for conversations & testing. No confidential info; call 211 for emergencies.
+  </footer>
+
+<script>
+  const out = (data) => { document.getElementById('output').textContent = JSON.stringify(data, null, 2); };
+
+  async function loadServices(){
+    try{
+      const res = await fetch('/services');
+      out(await res.json());
+    }catch(e){ out({error:String(e)}) }
+  }
+
+  async function triage(message){
+    try{
+      const res = await fetch('/ai_triage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message})});
+      out(await res.json());
+    }catch(e){ out({error:String(e)}) }
+  }
+
+  async function submitForm(e){
+    e.preventDefault();
+    const form = new FormData(document.getElementById('demoForm'));
+    const res = await fetch('/submit_form',{method:'POST',body:form});
+    out(await res.json());
+  }
+</script>
+</body>
+</html>
