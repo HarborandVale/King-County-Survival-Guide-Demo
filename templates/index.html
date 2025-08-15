@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>King County Survival Guide – Harbor &amp; Vale LLC (Demo)</title>
   <style>
+    /* Keep Quick Actions buttons consistent */
+.row > button { flex: 0 0 auto; }   /* don’t stretch */
+button { white-space: nowrap; }     /* keep on one line */
+
   /* Vaporwave-ish palette */
   :root {
     --brand-bg-1: #0b0c1e;      /* deep indigo */
@@ -137,6 +141,14 @@
 <button onclick="triage('I need housing')">AI: I need housing</button>
 <button onclick="triage('I need medical')">AI: I need medical</button>
     </div>
+    <div id="loading" class="pill" style="display:none;margin-top:8px">Loading…</div>
+
+  <p class="muted">These call demo endpoints to show flow. No real data yet.</p>
+
+    <div class="row" style="margin-top:8px">
+  <input id="q" placeholder="Search services (e.g., showers, IDs, meals)" />
+  <button onclick="loadServicesQuery()">Search</button>
+</div>
     <p class="muted">These call demo endpoints to show flow. No real data yet.</p>
   <div id="cards"></div>
 <pre id="output" class="card" style="display:none"></pre>
@@ -144,20 +156,33 @@
 
   </div>
 
-  <div class="card">
-    <h2>Contact / Intake (Demo)</h2>
-    <form id="demoForm" onsubmit="submitForm(event)">
-      <div class="row">
-        <input name="name" placeholder="Your name (optional)" />
-        <input name="need" placeholder="What do you need? (e.g., housing, ID, meal)" />
-      </div>
-      <textarea name="details" rows="3" placeholder="Add any details you'd like…"></textarea>
-      <div style="margin-top:12px">
-        <button type="submit">Submit</button>
-      </div>
-    </form>
-    <p class="muted">Sends a demo POST to <code>/submit_form</code> and shows a success message.</p>
+  <div class="card" id="quick-actions">
+  <h2>Quick Actions</h2>
+
+  <div class="row">
+    <button onclick="loadServices()">See Nearby Services</button>
+    <button onclick="triage('I need housing')">AI: I need housing</button>
+    <button onclick="triage('I need medical')">AI: I need medical</button>
+    <button onclick="loadServicesFiltered('Clinic')">Clinics</button>
+    <button onclick="loadServicesFiltered('Shelter')">Shelters</button>
   </div>
+
+  <!-- optional search row -->
+  <div class="row" style="margin-top:8px">
+    <input id="q" placeholder="Search services (e.g., showers, IDs, meals)" />
+    <button onclick="loadServicesQuery()">Search</button>
+  </div>
+
+  <!-- loading pill goes here -->
+  <div id="loading" class="pill" style="display:none;margin-top:8px">Loading…</div>
+
+  <p class="muted">These call demo endpoints to show flow. No real data yet.</p>
+
+  <!-- results go here -->
+  <div id="cards"></div>
+  <pre id="output" class="card" style="display:none"></pre>
+</div>
+
 
   <footer>
     © Harbor &amp; Vale LLC — demo for conversations & testing. No confidential info; call 211 for emergencies.
@@ -239,6 +264,36 @@ async function loadServicesFiltered(kind){
     out({ error: String(e) });
   }
 }
+async function loadServicesQuery(){
+  try{
+    const term = (document.getElementById('q')?.value || '').trim();
+    const url = term ? ('/services?q=' + encodeURIComponent(term)) : '/services';
+    let res = await fetch(url, { cache: 'no-store' });
+
+    if (!res.ok) {
+      await new Promise(r => setTimeout(r, 600));
+      res = await fetch(url, { cache: 'no-store' });
+    }
+
+    const txt = await res.text();
+    try {
+      const data = JSON.parse(txt);
+      renderCards(data);
+    } catch (parseErr) {
+      out({ error: 'Failed to parse JSON', status: res.status, raw: txt.slice(0, 400) });
+    }
+  } catch(e){
+    out({ error: String(e) });
+  }
+}
+
+// Optional: let Enter submit the search
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && document.activeElement?.id === 'q') {
+    e.preventDefault();
+    loadServicesQuery();
+  }
+});
 
 
   // Keep the AI triage with robust JSON handling
