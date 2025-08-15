@@ -11,6 +11,7 @@ app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 # -------- HTTPS redirect (safe for Render; skip for /health & when debugging) --------
+# -------- HTTPS redirect (skip for /health & when debugging) ----------
 @app.before_request
 def enforce_https():
     if app.debug or request.path == "/health":
@@ -18,14 +19,16 @@ def enforce_https():
     if request.headers.get("X-Forwarded-Proto", "http") != "https":
         code = 301 if request.method in ("GET", "HEAD") else 307
         return redirect(request.url.replace("http://", "https://", 1), code=code)
-        @app.route("/robots.txt")
-def robots():
-    return "User-agent: *\nDisallow: /\n", 200, {"Content-Type": "text/plain"}
 
-# --------------------------------- Health & errors -----------------------------------
+# ------------------------------- Health & robots -------------------------------
 @app.route("/health")
 def health():
     return jsonify({"ok": True})
+
+@app.route("/robots.txt")
+def robots():
+    # keep demos out of search indexes
+    return "User-agent: *\nDisallow: /\n", 200, {"Content-Type": "text/plain"}
 
 @app.errorhandler(404)
 def not_found(e):
@@ -34,7 +37,6 @@ def not_found(e):
 @app.errorhandler(500)
 def server_error(e):
     return jsonify({"error": "server error"}), 500
-
 
 # ----------------------------------- Tier 1 ------------------------------------------
 @app.route("/")
@@ -132,4 +134,5 @@ def services():
     walk = request.args.get("walk_in")
     walk_only = True if (walk and walk.lower() in ("1", "true", "yes")) else None
     return jsonify(fetch_services(q, kind, hood, walk_only))
+
 
