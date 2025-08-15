@@ -9,7 +9,8 @@
     "phone": "(206) 555-1212",
     "address": "123 Pine St, Seattle, WA",
     "website": "https://example.org/shelter",
-    "notes": "ID preferred; LGBTQ+ inclusive"
+    "notes": "ID preferred; LGBTQ+ inclusive",
+    "services": ["shelter", "beds", "night intake"]
   },
   {
     "name": "Aurora Day Center",
@@ -20,7 +21,8 @@
     "phone": "(206) 555-3434",
     "address": "8600 Aurora Ave N, Seattle, WA",
     "website": "https://example.org/daycenter",
-    "notes": "Showers, laundry, mail"
+    "notes": "Showers, laundry, mail; daytime rest area",
+    "services": ["showers", "laundry", "mail", "hygiene"]
   },
   {
     "name": "Harbor Free Clinic",
@@ -31,6 +33,44 @@
     "phone": "(206) 555-4545",
     "address": "500 Broadway E, Seattle, WA",
     "website": "https://example.org/clinic",
-    "notes": "MAT referrals; naloxone on site"
+    "notes": "MAT referrals; naloxone on site; primary care triage",
+    "services": ["medical", "clinic", "mat", "naloxone", "referrals"]
+  },
+  {
+    "name": "Seattle ID Assistance Center",
+    "type": "ID Services",
+    "neighborhood": "Downtown",
+    "hours": "Mon–Thu 10am–3pm",
+    "walk_in": false,
+    "phone": "(206) 555-2222",
+    "address": "200 4th Ave, Seattle, WA",
+    "website": "https://example.org/id",
+    "notes": "State ID, replacement birth certificates; appointments recommended",
+    "services": ["id", "identification", "documents", "license", "birth certificate"]
+  },
+  {
+    "name": "Pike Place Food Bank",
+    "type": "Food Bank",
+    "neighborhood": "Belltown",
+    "hours": "Tue/Thu 12–4pm",
+    "walk_in": true,
+    "phone": "(206) 555-9898",
+    "address": "2300 1st Ave, Seattle, WA",
+    "website": "https://example.org/food",
+    "notes": "Meals & groceries; pantry support",
+    "services": ["food", "meals", "groceries", "pantry"]
+  },
+  {
+    "name": "First Step Detox",
+    "type": "Detox",
+    "neighborhood": "SoDo",
+    "hours": "24/7 phone triage",
+    "walk_in": false,
+    "phone": "(206) 555-7777",
+    "address": "420 3rd Ave S, Seattle, WA",
+    "website": "https://example.org/detox",
+    "notes": "Alcohol/opioid detox; phone triage required before intake",
+    "services": ["detox", "withdrawal", "sobering"]
   }
 ]
+
