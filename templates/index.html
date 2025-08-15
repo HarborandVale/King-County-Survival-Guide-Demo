@@ -37,6 +37,8 @@
   <div class="card">
     <h2>Quick Actions</h2>
     <div class="row">
+      <button onclick="loadServicesFiltered('Clinic')">Clinics</button>
+<button onclick="loadServicesFiltered('Shelter')">Shelters</button>
       <button onclick="loadServices()">See Nearby Services</button>
 <button onclick="triage('I need housing')">AI: I need housing</button>
 <button onclick="triage('I need medical')">AI: I need medical</button>
@@ -98,6 +100,8 @@
           <p class="muted">${s.type || ''} • ${s.neighborhood || 'Seattle'} • ${s.hours || ''}</p>
           ${s.notes ? `<p>${s.notes}</p>` : ''}
           <div class="row">
+          <button onclick="loadServicesFiltered('Clinic')">Clinics</button>
+<button onclick="loadServicesFiltered('Shelter')">Shelters</button>
             ${tel ? `<a href="${tel}"><button>Call</button></a>` : ''}
             ${s.website ? `<a target="_blank" rel="noopener" href="${s.website}"><button>Website</button></a>` : ''}
             <a target="_blank" rel="noopener" href="${maps}"><button>Directions</button></a>
@@ -117,6 +121,15 @@
       out({ error: String(e) });
     }
   }
+async function loadServicesFiltered(kind){
+  try{
+    const res = await fetch('/services?type=' + encodeURIComponent(kind));
+    const data = await res.json();
+    renderCards(data);
+  }catch(e){
+    out({ error: String(e) });
+  }
+}
 
   // Keep the AI triage with robust JSON handling
   async function triage(message){
