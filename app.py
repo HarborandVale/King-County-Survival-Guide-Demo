@@ -85,17 +85,47 @@ def expand_query_terms(q: str):
             terms.update(syns)
     return terms
 
+# ---------- Tier 2: Services (file-backed with simple filters + synonym expansion) ----------
 def fetch_services(q=None, kind=None, neighborhood=None, walk_in_only=None):
     items = load_services()
     qterms = expand_query_terms(q)
 
     def matches(item):
         ok = True
+
         if kind:
-            ok &= item.get("type", "").lower() == kind.lower()
+            ok = ok and item.get("type", "").lower() == kind.lower()
+
         if neighborhood:
-            ok &= item.get("neighborhood", "").lower() == neighborhood.lower()
+            ok = ok and item.get("neighborhood", "").lower() == neighborhood.lower()
+
         if walk_in_only is True:
-            ok &= bool(item.get("walk_in", False))
+            ok = ok and bool(item.get("walk_in", False))
+
         if qterms:
-            hay = " ".join([
+            # Build a searchable string from several fields + services list
+            fields = [
+                item.get("name", ""),
+                item.get("notes", ""),
+                item.get("type", ""),
+                item.get("neighborhood", "")
+            ]
+            services = item.get("services", [])
+            fields.extend([str(s) for s in services])
+
+            hay = " ".join(fields).lower()
+            if not any(term in hay for term in qterms):
+                return False
+
+        return ok
+
+    return [x for x in items if matches(x)]
+
+@app.route("/services")
+def services():
+    q = request.args.get("q")
+    kind = request.args.get("type")
+    hood = request.args.get("neighborhood")
+    walk = request.args.get("walk_in")
+    walk_only = True if (walk and walk.lower() in ("1", "true", "yes")) else None
+    return jsonify(fetch_services(q, kind, hood, walk_only))
