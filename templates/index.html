@@ -1,59 +1,255 @@
-[
-  {
-    "id": "shelter-1",
-    "name": "Lake Union Women's Shelter",
-    "type": "Shelter",
-    "address": "123 Pine St, Seattle, WA",
-    "neighborhood": "Downtown",
-    "phone": "(206) 555-1212",
-    "email": "",
-    "hours": "Intake 4–8pm",
-    "website": "https://example.org/shelter",
-    "notes": "ID preferred; LGBTQ+ inclusive",
-    "tags": ["LGBTQ+ safe", "Wheelchair access", "Open tonight"],
-    "services": ["Shelter"],
-    "distance": "1.0 mi",
-    "walk_in": true,
-    "beds": 3,
-    "lastVerified": "2025-08-14",
-    "photo": ""
-  },
-  {
-    "id": "day-1",
-    "name": "Aurora Day Center",
-    "type": "Day Center",
-    "address": "8600 Aurora Ave N, Seattle, WA",
-    "neighborhood": "North Seattle",
-    "phone": "(206) 555-3434",
-    "email": "",
-    "hours": "8am–6pm daily",
-    "website": "https://example.org/daycenter",
-    "notes": "Showers, laundry, mail",
-    "tags": ["Showers", "Mail service", "Open today"],
-    "services": ["Day Center", "Showers", "Laundry"],
-    "distance": "4.2 mi",
-    "walk_in": true,
-    "beds": null,
-    "lastVerified": "2025-08-12",
-    "photo": ""
-  },
-  {
-    "id": "clinic-1",
-    "name": "Harbor Free Clinic",
-    "type": "Clinic",
-    "address": "500 Broadway E, Seattle, WA",
-    "neighborhood": "Capitol Hill",
-    "phone": "(206) 555-4545",
-    "email": "hello@harborclinic.org",
-    "hours": "Walk-ins Wed/Fri 1–5pm",
-    "website": "https://example.org/clinic",
-    "notes": "MAT referrals; naloxone on site",
-    "tags": ["Low-cost/Free", "Open today"],
-    "services": ["Primary Care", "Behavioral Health", "SUD"],
-    "distance": "2.1 mi",
-    "walk_in": true,
-    "beds": null,
-    "lastVerified": "2025-08-14",
-    "photo": ""
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>King County Survival Guide — Harbor &amp; Vale LLC (Demo)</title>
+
+  <!-- Social preview -->
+  <meta property="og:title" content="King County Survival Guide — Harbor & Vale LLC">
+  <meta property="og:description" content="A fast, culturally competent guide to real services in King County. Know more. Navigate better.">
+  <meta property="og:url" content="https://app.harborandvale.com/">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://app.harborandvale.com/static/logo.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="King County Survival Guide — Harbor & Vale LLC">
+  <meta name="twitter:description" content="A fast, culturally competent guide to real services in King County. Know more. Navigate better.">
+  <meta name="twitter:image" content="https://app.harborandvale.com/static/logo.png">
+
+  <style>
+    :root{
+      --bg1:#0b0c1e; --bg2:#1a1540;
+    }
+    /* Vaporwave background */
+    body{
+      background:
+        radial-gradient(1200px 800px at 20% -10%, #2a1b59 0%, transparent 60%),
+        radial-gradient(1000px 700px at 120% 20%, #0b3d91 0%, transparent 55%),
+        linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
+      color:#f2f2f7; font-family:system-ui, Arial, sans-serif;
+      max-width: 940px; margin: 24px auto; padding: 0 16px; line-height:1.45;
+    }
+    header{position:relative; margin:0 0 12px 0;}
+    .glow{
+      position:absolute; inset: -40px 0 auto 0; height:180px; z-index:0;
+      filter: blur(60px); opacity:.55; pointer-events:none;
+      background:
+        radial-gradient(circle at 30% 50%, #ff71ce, transparent 60%),
+        radial-gradient(circle at 70% 40%, #01cdfe, transparent 60%);
+    }
+    .hero{ position:relative; z-index:1; display:flex; align-items:center; gap:14px; }
+    h1{margin:0; font-size:28px;}
+    .muted{color:#cfd3ffcc; margin:2px 0 0;}
+    .pill{display:inline-block; font-size:12px; border:1px solid #ffffff2a; border-radius:999px; padding:4px 10px; background:#ffffff14; color:#fff;}
+    .card{border:1px solid #ffffff26; border-radius:14px; padding:16px; margin:12px 0; background:#ffffff14; box-shadow:0 8px 30px rgba(0,0,0,.12);}
+    .row{display:flex; gap:10px; flex-wrap:wrap}
+    button{padding:10px 14px; border-radius:10px; border:1px solid #ffffff26; cursor:pointer; background:linear-gradient(90deg,#ff71ce,#01cdfe); color:#101018; font-weight:600}
+    button:hover{opacity:.92}
+    input, textarea, select{background:#ffffff12; color:#fff; border:1px solid #ffffff26; border-radius:10px; padding:10px; width:100%}
+    a {color:#e3e8ff; text-decoration: none;}
+    .service-card h3{margin:0 0 4px 0}
+    .service-meta{color:#dfe3ffb3; margin:0 0 8px 0; font-size:13px}
+    footer{margin:24px 0 40px; font-size:12px; color:#cfd3ffb0}
+    #output{white-space:pre-wrap}
+    #loading{display:none}
+    .hide{display:none}
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="glow"></div>
+    <div class="hero">
+      <img src="{{ url_for('static', filename='logo.png') }}" alt="Harbor &amp; Vale LLC" style="height:72px;width:auto;border-radius:16px;border:1px solid #ffffff33;background:#ffffffee">
+      <div>
+        <h1>King County Survival Guide</h1>
+        <p class="muted">Know More. Navigate Better. • by Harbor &amp; Vale LLC</p>
+        <span class="pill">DEMO • Flask</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Toolbar -->
+  <div class="card">
+    <div class="row">
+      <button type="button" onclick="loadServices()">See all</button>
+      <button type="button" onclick="loadServicesFiltered('Shelter')">Shelters</button>
+      <button type="button" onclick="loadServicesFiltered('Clinic')">Clinics</button>
+      <button type="button" onclick="loadServicesQuery('showers')">Showers</button>
+
+      <button type="button" onclick="triage('I need housing')">AI: I need housing</button>
+      <button type="button" onclick="triage('I need medical')">AI: I need medical</button>
+
+      <!-- Link to your React beta -->
+      <a href="https://kcsg-react-beta.onrender.com" target="_blank" rel="noopener">
+        <button type="button">Try the React Beta</button>
+      </a>
+
+      <span id="loading" class="pill">Loading…</span>
+    </div>
+  </div>
+
+  <!-- Cards go here -->
+  <div id="cards"></div>
+
+  <!-- Debug output (hidden by default; shown on errors) -->
+  <pre id="output" class="card hide"></pre>
+
+  <!-- Intake / contact -->
+  <div class="card">
+    <h2 style="margin:0 0 8px 0">Contact / Intake (Demo)</h2>
+    <form id="demoForm" onsubmit="submitForm(event)">
+      <div class="row">
+        <input name="name" placeholder="Your name (optional)" />
+        <input name="need" placeholder="What do you need? (e.g., housing, ID, meal)" />
+      </div>
+      <textarea name="details" rows="3" placeholder="Add any details you'd like…"></textarea>
+      <div style="margin-top:12px">
+        <button type="submit">Submit</button>
+      </div>
+    </form>
+    <p class="muted" style="margin-top:8px">Sends a demo POST to <code>/submit_form</code> and shows a success message.</p>
+  </div>
+
+  <footer>
+    © Harbor &amp; Vale LLC — demo for conversations &amp; testing. No confidential info; call 211 for emergencies.
+  </footer>
+
+<script>
+  /* ---------- helpers ---------- */
+  const outEl = document.getElementById('output');
+  const loadingEl = document.getElementById('loading');
+
+  function showLoading(on){ loadingEl.style.display = on ? 'inline-block' : 'none'; }
+  function showOutput(on){ outEl.classList.toggle('hide', !on); }
+
+  function out(data){
+    showOutput(true);
+    try { outEl.textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2); }
+    catch(e){ outEl.textContent = String(data); }
   }
-]
+
+  function copyAddr(addr){
+    try { navigator.clipboard.writeText(addr || ""); alert("Address copied"); }
+    catch(e){ alert("Copy failed"); }
+  }
+
+  /* ---------- card renderer (with Copy + Report) ---------- */
+  function renderCards(list){
+    const el = document.getElementById('cards');
+    if (!Array.isArray(list)) { out({error:"Expected array"}); return; }
+
+    el.innerHTML = list.map(s => {
+      const maps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.address || s.name || '')}`;
+      const tel  = s.phone ? `tel:${s.phone.replace(/[^+\d]/g,'')}` : null;
+
+      const reportMailto = `mailto:intake@harborandvale.com?subject=${
+        encodeURIComponent('Correction for ' + (s.name || 'Service'))
+      }&body=${
+        encodeURIComponent(
+`Service: ${s.name || ''}
+Address: ${s.address || ''}
+
+What’s wrong?
+
+What should it be?
+
+(Optional) Your name/contact:
+`
+        )
+      }`;
+
+      const safeAddr = (s.address || '').replace(/'/g, '&#39;');
+
+      return `
+        <div class="card service-card">
+          <h3>${s.name || 'Service'}</h3>
+          <p class="service-meta">${s.type || ''} • ${s.neighborhood || 'Seattle'} • ${s.hours || ''}</p>
+          ${s.notes ? `<p>${s.notes}</p>` : ''}
+          <div class="row" style="margin-top:8px">
+            ${tel ? `<a href="${tel}"><button>Call</button></a>` : ''}
+            ${s.website ? `<a target="_blank" rel="noopener" href="${s.website}"><button>Website</button></a>` : ''}
+            <a target="_blank" rel="noopener" href="${maps}"><button>Directions</button></a>
+            ${s.address ? `<button onclick="copyAddr('${safeAddr}')">Copy address</button>` : ''}
+            <a href="${reportMailto}"><button>Report incorrect</button></a>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  /* ---------- fetch helpers ---------- */
+  async function fetchJSON(url){
+    try{
+      let res = await fetch(url, { cache: 'no-store' });
+      if (!res.ok) {
+        await new Promise(r=>setTimeout(r,500));
+        res = await fetch(url, { cache: 'no-store' });
+      }
+      const txt = await res.text();
+      try { return JSON.parse(txt); }
+      catch(parseErr){ out({ error:'Failed to parse JSON', status: res.status, raw: txt.slice(0,400) }); return null; }
+    }catch(e){ out({ error:String(e) }); return null; }
+  }
+
+  /* ---------- data fetchers ---------- */
+  // Show all (no filters)
+  async function loadServices(){
+    showLoading(true); showOutput(false);
+    const data = await fetchJSON('/services');
+    if (data) renderCards(data);
+    showLoading(false);
+  }
+
+  // Filter by type (e.g., Shelter, Clinic)
+  async function loadServicesFiltered(kind){
+    showLoading(true); showOutput(false);
+    const data = await fetchJSON('/services?type=' + encodeURIComponent(kind));
+    if (data) renderCards(data);
+    showLoading(false);
+  }
+
+  // Keyword query (e.g., showers)
+  async function loadServicesQuery(q){
+    showLoading(true); showOutput(false);
+    const data = await fetchJSON('/services?q=' + encodeURIComponent(q));
+    if (data) renderCards(data);
+    showLoading(false);
+  }
+
+  /* ---------- AI triage ---------- */
+  async function triage(message){
+    showLoading(true); showOutput(false);
+    try{
+      const res = await fetch('/ai_triage', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ message })
+      });
+      const txt = await res.text();
+      try { out(JSON.parse(txt)); }
+      catch(parseErr){ out({ error:'Failed to parse JSON', status: res.status, raw: txt.slice(0,400) }); }
+    }catch(e){ out({ error:String(e) }); }
+    showLoading(false);
+  }
+
+  /* ---------- intake form ---------- */
+  async function submitForm(e){
+    e.preventDefault(); showLoading(true); showOutput(false);
+    try{
+      const form = new FormData(document.getElementById('demoForm'));
+      const res = await fetch('/submit_form', { method:'POST', body:form });
+      const txt = await res.text();
+      try { out(JSON.parse(txt)); }
+      catch(parseErr){ out({ error:'Failed to parse JSON', status: res.status, raw: txt.slice(0,400) }); }
+    }catch(e){ out({ error:String(e) }); }
+    showLoading(false);
+  }
+
+  // Load something on first paint
+  loadServices();
+</script>
+</body>
+</html>
+
