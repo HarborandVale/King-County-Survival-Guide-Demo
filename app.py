@@ -9,6 +9,9 @@ import os
 
 app = Flask(__name__)
 
+@app.route('/health')
+def health():
+    return jsonify({"ok": True})
 # --- TIER 1: MVP ---
 @app.route('/')
 def index():
@@ -56,3 +59,4 @@ test_ai_triage()
 if __name__ == '__main__':
     # Disable debug mode to avoid multiprocessing errors in restricted environments
     app.run(debug=False)
+
