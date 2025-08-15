@@ -1,62 +1,88 @@
-# Optimized code framework for the concierge app build, divided into tiers
+# Harbor & Vale — King County Survival Guide (Demo)
+# Minimal Flask app with health check, basic services, and simple AI triage.
 
-try:
-    from flask import Flask, request, jsonify, render_template
-except ModuleNotFoundError:
-    raise ImportError("Flask is not installed in this environment. Please install it using 'pip install flask' or run the code in an environment where Flask is available.")
-
-import os
+from flask import Flask, request, jsonify, render_template
 
 app = Flask(__name__)
 
-@app.route('/health')
+# ---------- Health & Error Handling ----------
+@app.route("/health")
 def health():
     return jsonify({"ok": True})
-# --- TIER 1: MVP ---
-@app.route('/')
+
+@app.errorhandler(404)
+def not_found(e):
+    return jsonify({"error": "not found"}), 404
+
+@app.errorhandler(500)
+def server_error(e):
+    return jsonify({"error": "server error"}), 500
+
+
+# ---------- Tier 1: Landing + Intake ----------
+@app.route("/")
 def index():
-    return render_template('index.html')
+    return render_template("index.html")
 
-@app.route('/submit_form', methods=['POST'])
+@app.route("/submit_form", methods=["POST"])
 def submit_form():
-    data = request.form
+    data = request.form.to_dict(flat=True)
+    # In a real app you'd persist this somewhere; here we just confirm receipt.
     print("Form submitted:", data)
-    return jsonify({'status': 'success'})
+    return jsonify({"status": "success"})
 
-# --- TIER 2: Case manager dashboard + API integration ---
-def fetch_services_from_api():
+
+# ---------- Tier 2: Services (stub) ----------
+def fetch_services_from_api_stub():
+    # Replace with real data later; this is just a placeholder.
     return [
-        {'name': 'Shelter A', 'beds': 2, 'status': 'Available'},
-        {'name': 'Clinic B', 'status': 'Walk-ins Only'}
+        {"name": "Shelter A", "beds": 2, "status": "Available"},
+        {"name": "Clinic B", "status": "Walk-ins Only"},
     ]
 
-@app.route('/services')
+@app.route("/services")
 def services():
-    services = fetch_services_from_api()
-    return jsonify(services)
+    items = fetch_services_from_api_stub()
+    return jsonify(items)
 
-# --- TIER 3: AI smart routing + analytics ---
-def ai_triage(user_input):
-    if 'housing' in user_input.lower():
-        return {'recommendation': 'Apply to Shelter A'}
-    elif 'medical' in user_input.lower():
-        return {'recommendation': 'Visit Clinic B'}
-    return {'recommendation': 'Call 211'}
 
-@app.route('/ai_triage', methods=['POST'])
+# ---------- Tier 3: AI Triage (simple keyword logic) ----------
+def ai_triage(user_input: str):
+    text = (user_input or "").lower().strip()
+
+    # Medical first (catch clinic/doctor/health needs)
+    if any(k in text for k in (
+        "medical", "doctor", "clinic", "nurse", "health", "sick",
+        "injury", "hurt", "wound", "od", "overdose"
+    )):
+        return {"recommendation": "Visit Clinic B"}
+
+    # Housing & shelter needs
+    if any(k in text for k in (
+        "housing", "shelter", "bed", "room", "sleep", "unhoused", "tent"
+    )):
+        return {"recommendation": "Apply to Shelter A"}
+
+    # Fallback
+    return {"recommendation": "Call 211"}
+
+@app.route("/ai_triage", methods=["POST"])
 def triage():
-    user_input = request.json.get('message', '')
-    return jsonify(ai_triage(user_input))
+    payload = request.get_json(silent=True) or {}
+    user_input = payload.get("message", "")
+    result = ai_triage(user_input)
+    # Echo input back for clarity while testing.
+    return jsonify({"input": user_input, **result})
 
-# --- TEST CASES ---
+
+# ---------- Local Test Cases (run only when launched locally) ----------
 def test_ai_triage():
-    assert ai_triage("I need housing") == {'recommendation': 'Apply to Shelter A'}
-    assert ai_triage("I have a medical emergency") == {'recommendation': 'Visit Clinic B'}
-    assert ai_triage("Something else") == {'recommendation': 'Call 211'}
+    assert ai_triage("I need housing") == {"recommendation": "Apply to Shelter A"}
+    assert ai_triage("I have a medical emergency") == {"recommendation": "Visit Clinic B"}
+    assert ai_triage("Something else") == {"recommendation": "Call 211"}
 
-test_ai_triage()
-
-if __name__ == '__main__':
-    # Disable debug mode to avoid multiprocessing errors in restricted environments
-    app.run(debug=False)
-
+if __name__ == "__main__":
+    # Run sanity tests only for local dev, not on Render/gunicorn import.
+    test_ai_triage()
+    # Local server for quick checks (Render will use gunicorn start command)
+    app.run(host="0.0.0.0", port=5000, debug=False)
