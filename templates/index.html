@@ -5,206 +5,189 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>King County Survival Guide – Harbor &amp; Vale LLC (Demo)</title>
   <style>
-    /* Keep Quick Actions buttons consistent */
-.row > button { flex: 0 0 auto; }   /* don’t stretch */
-button { white-space: nowrap; }     /* keep on one line */
+    /* Vaporwave palette — brighter accents */
+    :root {
+      --brand-bg-1: #0b0c1e;
+      --brand-bg-2: #1a1540;
+      --brand-card: rgba(255,255,255,0.06);
+      --brand-border: rgba(255,255,255,0.12);
+      --brand-text: #f2f2f7;
+      --brand-muted: #b8b8d9;
+      --brand-primary: #9b6bff;   /* brighter neon purple */
+      --brand-accent: #ff71ce;    /* neon pink */
+      --brand-cyan: #01cdfe;      /* neon cyan */
+      --shadow: 0 8px 28px rgba(0,0,0,.35);
+    }
 
-  /* Vaporwave-ish palette */
-  :root {
-    --brand-bg-1: #0b0c1e;      /* deep indigo */
-    --brand-bg-2: #1a1540;      /* purple midnight */
-    --brand-card: rgba(255,255,255,0.06);
-    --brand-border: rgba(255,255,255,0.12);
-    --brand-text: #f2f2f7;      /* near-white */
-    --brand-muted: #b8b8d9;     /* muted violet-gray */
-    --brand-primary: #7d5fff;   /* neon purple */
-    --brand-accent: #ff71ce;    /* neon pink */
-    --brand-cyan: #01cdfe;      /* neon cyan */
-    --shadow: 0 8px 28px rgba(0,0,0,.35);
-  }
+    html, body { height: 100%; }
+    body{
+      font-family: system-ui, Arial, sans-serif;
+      color: var(--brand-text);
+      background: radial-gradient(1200px 800px at 20% -10%, #2a1b59 0%, transparent 60%),
+                  radial-gradient(1000px 700px at 120% 20%, #0b3d91 0%, transparent 55%),
+                  linear-gradient(180deg, var(--brand-bg-1) 0%, var(--brand-bg-2) 100%);
+      max-width: 900px;
+      margin: 24px auto;
+      padding: 0 16px;
+      line-height: 1.5;
+    }
 
-  html, body { height: 100%; }
-  body{
-    font-family: system-ui, Arial, sans-serif;
-    color: var(--brand-text);
-    background: radial-gradient(1200px 800px at 20% -10%, #2a1b59 0%, transparent 60%),
-                radial-gradient(1000px 700px at 120% 20%, #0b3d91 0%, transparent 55%),
-                linear-gradient(180deg, var(--brand-bg-1) 0%, var(--brand-bg-2) 100%);
-    max-width: 900px;
-    margin: 24px auto;
-    padding: 0 16px;
-    line-height: 1.5;
-  }
+    h1, h2, h3 { color: var(--brand-text); }
+    .muted{ color: var(--brand-muted); margin:0; }
 
-  h1, h2, h3 { color: var(--brand-text); }
-  .muted{ color: var(--brand-muted); }
+    .pill{
+      font-size:12px;
+      border:1px solid var(--brand-border);
+      border-radius:999px;
+      padding:4px 10px;
+      color: var(--brand-muted);
+      background: var(--brand-card);
+      backdrop-filter: blur(6px);
+    }
 
-  .pill{
-    font-size:12px;
-    border:1px solid var(--brand-border);
-    border-radius:999px;
-    padding:4px 10px;
-    color: var(--brand-muted);
-    background: var(--brand-card);
-    backdrop-filter: blur(6px);
-  }
+    .card{
+      border:1px solid var(--brand-border);
+      border-radius:14px;
+      padding:16px;
+      margin:12px 0;
+      background: var(--brand-card);
+      box-shadow: var(--shadow);
+    }
 
-  .card{
-    border:1px solid var(--brand-border);
-    border-radius:14px;
-    padding:16px;
-    margin:12px 0;
-    background: var(--brand-card);
-    box-shadow: var(--shadow);
-  }
+    button{
+      padding:10px 14px;
+      border-radius:12px;
+      border:1px solid var(--brand-border);
+      cursor:pointer;
+      background: linear-gradient(135deg, var(--brand-accent), var(--brand-cyan));
+      color:#0b0c1e;
+      font-weight:600;
+      white-space: nowrap; /* keep on one line */
+    }
+    button:hover{ filter: brightness(1.05); }
+    button:active{ transform: translateY(1px); }
 
-  button{
-    padding:10px 14px;
-    border-radius:12px;
-    border:1px solid var(--brand-border);
-    cursor:pointer;
-    background: linear-gradient(135deg, var(--brand-accent), var(--brand-cyan));
-    color:#0b0c1e;
-    font-weight:600;
-  }
-  button:hover{ filter: brightness(1.05); }
-  button:active{ transform: translateY(1px); }
+    input,textarea{
+      width:100%;
+      padding:10px;
+      border-radius:10px;
+      border:1px solid var(--brand-border);
+      background: rgba(255,255,255,0.06);
+      color: var(--brand-text);
+    }
 
-  input,textarea{
-    width:100%;
-    padding:10px;
-    border-radius:10px;
-    border:1px solid var(--brand-border);
-    background: rgba(255,255,255,0.06);
-    color: var(--brand-text);
-  }
+    .row{ display:flex; gap:12px; flex-wrap:wrap }
+    .row > *{ flex:1 1 200px }
+    /* Keep Quick Actions buttons consistent size */
+    .row > button { flex: 0 0 auto; }
 
-  .row{ display:flex; gap:12px; flex-wrap:wrap }
-  .row > *{ flex:1 1 200px }
+    code{ background: rgba(255,255,255,0.08); padding:2px 6px; border-radius:6px; color: var(--brand-cyan); }
+    #output{ white-space: pre-wrap; display:none; } /* hidden until we need it */
 
-  code{ background: rgba(255,255,255,0.08); padding:2px 6px; border-radius:6px; color: var(--brand-cyan); }
-  #output{ white-space: pre-wrap; }
+    .badge{
+      display:inline-block; padding:2px 8px; border-radius:999px;
+      border:1px solid var(--brand-border); background: rgba(255,255,255,0.08);
+      font-size: 12px; margin-right:8px;
+    }
+
+    /* Glow behind the hero */
     .hero { position: relative; }
-.glow {
-  position: absolute;
-  left: 50%;
-  top: -20px;
-  transform: translateX(-50%);
-  width: 520px; height: 180px;
-  background:
-    radial-gradient(closest-side, var(--brand-accent), transparent 60%),
-    radial-gradient(closest-side, var(--brand-cyan),   transparent 65%);
-  filter: blur(40px);
-  opacity: .35;
-  pointer-events: none;
-  z-index: 0;
-}
-    .hero { position: relative; }
-.glow {
-  position: absolute;
-  left: 50%;
-  top: -20px;
-  transform: translateX(-50%);
-  width: 520px; height: 180px;
-  background:
-    radial-gradient(closest-side, var(--brand-accent), transparent 60%),
-    radial-gradient(closest-side, var(--brand-cyan),   transparent 65%);
-  filter: blur(40px);
-  opacity: .35;
-  pointer-events: none;
-  z-index: 0;
-}
-
-</style>
-
+    .glow {
+      position: absolute; left: 50%; top: -20px; transform: translateX(-50%);
+      width: 520px; height: 180px;
+      background:
+        radial-gradient(closest-side, var(--brand-accent), transparent 60%),
+        radial-gradient(closest-side, var(--brand-cyan),   transparent 65%);
+      filter: blur(40px); opacity: .35; pointer-events: none; z-index: 0;
+    }
+  </style>
 </head>
 <body>
+
   <div class="hero">
-  <div class="glow"></div>
-  <header style="display:flex;align-items:center;gap:12px;margin-bottom:16px;position:relative;z-index:1">
-    <img src="{{ url_for('static', filename='logo.png') }}" alt="Harbor &amp; Vale LLC" style="height:56px;width:auto;">
-    <div>
-      <h1 style="margin:0">King County Survival Guide</h1>
-      <p class="muted" style="margin:0">by Harbor &amp; Vale LLC</p>
-    </div>
-    <span class="pill" style="margin-left:auto">Demo • Tier 1–3 skeleton</span>
-  </header>
-</div>
+    <div class="glow"></div>
+    <header style="display:flex;align-items:center;gap:12px;margin-bottom:16px;position:relative;z-index:1">
+      <img src="{{ url_for('static', filename='logo.png') }}" alt="Harbor &amp; Vale LLC" style="height:56px;width:auto;">
+      <div>
+        <h1 style="margin:0">King County Survival Guide</h1>
+        <p class="muted" style="margin:0">by Harbor &amp; Vale LLC</p>
+      </div>
+      <span class="pill" style="margin-left:auto">Demo • Tier 1–3 skeleton</span>
+    </header>
+  </div>
 
-
-  <div class="card">
+  <!-- Quick Actions (single block) -->
+  <div class="card" id="quick-actions">
     <h2>Quick Actions</h2>
     <div class="row">
-      <button onclick="loadServicesFiltered('Clinic')">Clinics</button>
-<button onclick="loadServicesFiltered('Shelter')">Shelters</button>
       <button onclick="loadServices()">See Nearby Services</button>
-<button onclick="triage('I need housing')">AI: I need housing</button>
-<button onclick="triage('I need medical')">AI: I need medical</button>
+      <button onclick="triage('I need housing')">AI: I need housing</button>
+      <button onclick="triage('I need medical')">AI: I need medical</button>
+      <button onclick="loadServicesFiltered('Clinic')">Clinics</button>
+      <button onclick="loadServicesFiltered('Shelter')">Shelters</button>
     </div>
+
+    <!-- Search row -->
+    <div class="row" style="margin-top:8px">
+      <input id="q" placeholder="Search services (e.g., showers, IDs, meals, transit)" />
+      <button onclick="loadServicesQuery()">Search</button>
+      <button onclick="clearSearch()">Clear</button>
+    </div>
+
+    <!-- Loading indicator -->
     <div id="loading" class="pill" style="display:none;margin-top:8px">Loading…</div>
 
-  <p class="muted">These call demo endpoints to show flow. No real data yet.</p>
+    <p class="muted">Actions show functional flow only. For emergencies call 911; for crisis call/text 988; for general resources call 211.</p>
 
-    <div class="row" style="margin-top:8px">
-  <input id="q" placeholder="Search services (e.g., showers, IDs, meals)" />
-  <button onclick="loadServicesQuery()">Search</button>
-</div>
-    <p class="muted">These call demo endpoints to show flow. No real data yet.</p>
-  <div id="cards"></div>
-<pre id="output" class="card" style="display:none"></pre>
-
-
+    <!-- Results containers -->
+    <div id="cards"></div>
+    <pre id="output" class="card"></pre>
   </div>
 
-  <div class="card" id="quick-actions">
-  <h2>Quick Actions</h2>
-
-  <div class="row">
-    <button onclick="loadServices()">See Nearby Services</button>
-    <button onclick="triage('I need housing')">AI: I need housing</button>
-    <button onclick="triage('I need medical')">AI: I need medical</button>
-    <button onclick="loadServicesFiltered('Clinic')">Clinics</button>
-    <button onclick="loadServicesFiltered('Shelter')">Shelters</button>
+  <!-- Intake -->
+  <div class="card">
+    <h2>Contact / Intake (Demo)</h2>
+    <form id="demoForm" onsubmit="submitForm(event)">
+      <div class="row">
+        <input name="name" placeholder="Your name (optional)" />
+        <input name="need" placeholder="What do you need? (e.g., housing, ID, meal)" />
+      </div>
+      <textarea name="details" rows="3" placeholder="Add any details you'd like…"></textarea>
+      <div style="margin-top:12px">
+        <button type="submit">Submit</button>
+      </div>
+    </form>
+    <p class="muted">Sends a demo POST to <code>/submit_form</code> and shows a success message.</p>
   </div>
 
-  <!-- optional search row -->
-  <div class="row" style="margin-top:8px">
-    <input id="q" placeholder="Search services (e.g., showers, IDs, meals)" />
-    <button onclick="loadServicesQuery()">Search</button>
-  </div>
-
-  <!-- loading pill goes here -->
-  <div id="loading" class="pill" style="display:none;margin-top:8px">Loading…</div>
-
-  <p class="muted">These call demo endpoints to show flow. No real data yet.</p>
-
-  <!-- results go here -->
-  <div id="cards"></div>
-  <pre id="output" class="card" style="display:none"></pre>
-</div>
-
-
-  <footer>
-    © Harbor &amp; Vale LLC — demo for conversations & testing. No confidential info; call 211 for emergencies.
+  <footer class="muted" style="margin-top:28px;font-size:12px">
+    © Harbor &amp; Vale LLC — demo only. No PHI; call 211 for general resources, 911 for emergencies, and 988 for mental health crises.
+    <br/>Not affiliated with King County government.
+    <br/>Contact: <a href="mailto:info@harborandvale.com">info@harborandvale.com</a>
   </footer>
 
 <script>
-  // Show debug output (and make it visible if hidden)
+  // Debug output helper (shows the hidden box when needed)
   const out = (data) => {
     const el = document.getElementById('output');
-    if (el) {
-      el.style.display = 'block';
-      el.textContent = JSON.stringify(data, null, 2);
-    }
+    if (el) { el.style.display = 'block'; el.textContent = JSON.stringify(data, null, 2); }
   };
 
-  // Surface any JavaScript errors to the page (so nothing fails silently)
+  // Show any JS errors in the output box (no silent failures)
   window.onerror = function(msg, src, line, col, err){
     out({ js_error: String(msg), src, line, col, stack: err && err.stack });
     return false;
   };
 
-  // Render service "cards" with Call / Website / Directions
+  // Loading pill toggler
+  function setLoading(on, msg){
+    const el = document.getElementById('loading');
+    if (!el) return;
+    el.style.display = on ? 'inline-block' : 'none';
+    el.textContent = msg || 'Loading…';
+  }
+
+  // Render result cards with badges and actions
   function renderCards(list){
     const el = document.getElementById('cards');
     if (!el) { out({error:"Missing #cards container"}); return; }
@@ -213,106 +196,110 @@ button { white-space: nowrap; }     /* keep on one line */
     el.innerHTML = list.map(s => {
       const maps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.address || s.name)}`;
       const tel  = s.phone ? `tel:${s.phone.replace(/[^+\d]/g,'')}` : null;
+      const walk = s.walk_in ? `<span class="badge">Walk-in</span>` : ``;
+      const hours = s.hours ? `<span class="badge">${s.hours}</span>` : ``;
       return `
         <div class="card">
-          <h3>${s.name}</h3>
-          <p class="muted">${s.type || ''} • ${s.neighborhood || 'Seattle'} • ${s.hours || ''}</p>
+          <div style="margin-bottom:6px">${walk}${hours}</div>
+          <h3 style="margin:0 0 4px 0">${s.name}</h3>
+          <p class="muted">${s.type || ''} • ${s.neighborhood || 'Seattle'}</p>
           ${s.notes ? `<p>${s.notes}</p>` : ''}
-          <div class="row">
-          <button onclick="loadServicesFiltered('Clinic')">Clinics</button>
-<button onclick="loadServicesFiltered('Shelter')">Shelters</button>
+          <div class="row" style="margin-top:8px">
             ${tel ? `<a href="${tel}"><button>Call</button></a>` : ''}
             ${s.website ? `<a target="_blank" rel="noopener" href="${s.website}"><button>Website</button></a>` : ''}
             <a target="_blank" rel="noopener" href="${maps}"><button>Directions</button></a>
+            ${s.address ? `<button onclick="copyAddr('${(s.address||'').replace(/'/g, "\\'")}')">Copy address</button>` : ''}
           </div>
         </div>
       `;
     }).join('');
   }
 
-  // Load services and render as cards
-  async function loadServices(){
+  function copyAddr(addr){
     try{
-      const res = await fetch('/services');
+      navigator.clipboard.writeText(addr);
+      setLoading(true, 'Address copied'); setTimeout(()=>setLoading(false), 700);
+    }catch(e){
+      out({error:'Clipboard failed', detail:String(e)});
+    }
+  }
+
+  // Load all services
+  async function loadServices(){
+    setLoading(true, 'Loading services…');
+    try{
+      const res = await fetch('/services', { cache: 'no-store' });
       const data = await res.json();
       renderCards(data);
     }catch(e){
       out({ error: String(e) });
+    }finally{
+      setLoading(false);
     }
   }
-<!-- REPLACE your old loadServicesFiltered with this -->
-async function loadServicesFiltered(kind){
-  try{
-    // First try (avoid cached responses)
-    let res = await fetch('/services?type=' + encodeURIComponent(kind), { cache: 'no-store' });
 
-    // If server hiccups (e.g., 502), retry once after a short pause
-    if (!res.ok) {
-      await new Promise(r => setTimeout(r, 600));
-      res = await fetch('/services?type=' + encodeURIComponent(kind), { cache: 'no-store' });
+  // Filter by type, with a retry for hobby-tier hiccups
+  async function loadServicesFiltered(kind){
+    setLoading(true, `Filtering: ${kind}`);
+    try{
+      let res = await fetch('/services?type=' + encodeURIComponent(kind), { cache: 'no-store' });
+      if (!res.ok) {
+        await new Promise(r => setTimeout(r, 600));
+        res = await fetch('/services?type=' + encodeURIComponent(kind), { cache: 'no-store' });
+      }
+      const txt = await res.text();
+      try { renderCards(JSON.parse(txt)); }
+      catch (parseErr) { out({ error: 'Failed to parse JSON', status: res.status, raw: txt.slice(0, 400) }); }
+    }catch(e){
+      out({ error: String(e) });
+    }finally{
+      setLoading(false);
     }
-
-    // Read raw text first, then parse (so we can show useful errors)
-    const txt = await res.text();
-    try {
-      const data = JSON.parse(txt);
-      renderCards(data);
-    } catch (parseErr) {
-      out({ error: 'Failed to parse JSON', status: res.status, raw: txt.slice(0, 400) });
-    }
-  } catch(e){
-    out({ error: String(e) });
   }
-}
-async function loadServicesQuery(){
-  try{
+
+  // Keyword search (with synonyms handled on the server)
+  async function loadServicesQuery(){
     const term = (document.getElementById('q')?.value || '').trim();
-    const url = term ? ('/services?q=' + encodeURIComponent(term)) : '/services';
-    let res = await fetch(url, { cache: 'no-store' });
-
-    if (!res.ok) {
-      await new Promise(r => setTimeout(r, 600));
-      res = await fetch(url, { cache: 'no-store' });
+    setLoading(true, term ? `Searching: ${term}` : 'Loading services…');
+    try{
+      const url = term ? ('/services?q=' + encodeURIComponent(term)) : '/services';
+      let res = await fetch(url, { cache: 'no-store' });
+      if (!res.ok) {
+        await new Promise(r => setTimeout(r, 600));
+        res = await fetch(url, { cache: 'no-store' });
+      }
+      const txt = await res.text();
+      try { renderCards(JSON.parse(txt)); }
+      catch (parseErr) { out({ error: 'Failed to parse JSON', status: res.status, raw: txt.slice(0, 400) }); }
+    }catch(e){
+      out({ error: String(e) });
+    }finally{
+      setLoading(false);
     }
-
-    const txt = await res.text();
-    try {
-      const data = JSON.parse(txt);
-      renderCards(data);
-    } catch (parseErr) {
-      out({ error: 'Failed to parse JSON', status: res.status, raw: txt.slice(0, 400) });
-    }
-  } catch(e){
-    out({ error: String(e) });
   }
-}
 
-// Optional: let Enter submit the search
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && document.activeElement?.id === 'q') {
-    e.preventDefault();
-    loadServicesQuery();
+  function clearSearch(){
+    const inp = document.getElementById('q'); if (inp) inp.value = '';
+    document.getElementById('cards').innerHTML = '';
+    document.getElementById('output').style.display = 'none';
   }
-});
 
-
-  // Keep the AI triage with robust JSON handling
+  // AI triage (robust parsing + loading)
   async function triage(message){
+    setLoading(true, 'Thinking…');
     try{
       const res = await fetch('/ai_triage', {
         method: 'POST',
-        headers: {'Content-Type':'application/json'},
+        headers:{'Content-Type':'application/json'},
         body: JSON.stringify({ message })
       });
       const txt = await res.text();
-      try {
-        const data = JSON.parse(txt);
-        out(data);
-      } catch (parseErr) {
-        out({ error: String(parseErr), status: res.status, raw: txt.slice(0, 300) });
-      }
+      try { out(JSON.parse(txt)); }
+      catch (parseErr) { out({ error: String(parseErr), status: res.status, raw: txt.slice(0, 300) }); }
     } catch(e){
       out({ error: String(e) });
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -323,7 +310,14 @@ document.addEventListener('keydown', (e) => {
     const res = await fetch('/submit_form',{ method:'POST', body: form });
     out(await res.json());
   }
-</script>
 
+  // Enter submits search
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && document.activeElement?.id === 'q') {
+      e.preventDefault();
+      loadServicesQuery();
+    }
+  });
+</script>
 </body>
 </html>
