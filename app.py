@@ -6,6 +6,8 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 app = Flask(__name__)
 
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+
 # ---------- Health & Error Handling ----------
 @app.route("/health")
 def health():
@@ -87,4 +89,5 @@ if __name__ == "__main__":
     test_ai_triage()
     # Local server for quick checks (Render will use gunicorn start command)
     app.run(host="0.0.0.0", port=5000, debug=False)
+
 
