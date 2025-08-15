@@ -1,7 +1,8 @@
 # Harbor & Vale — King County Survival Guide (Demo)
 # Minimal Flask app with health check, basic services, and simple AI triage.
 
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, redirect
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 app = Flask(__name__)
 
@@ -86,3 +87,4 @@ if __name__ == "__main__":
     test_ai_triage()
     # Local server for quick checks (Render will use gunicorn start command)
     app.run(host="0.0.0.0", port=5000, debug=False)
+
