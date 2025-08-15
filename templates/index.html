@@ -3,275 +3,54 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>King County Survival Guide – Harbor &amp; Vale LLC (Demo)</title>
-  <link rel="manifest" href="/manifest.json">
-  <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js',{scope:'/'});}window.addEventListener('offline',()=>{const b=document.getElementById('offline');if(b)b.style.display='block'});window.addEventListener('online',()=>{const b=document.getElementById('offline');if(b)b.style.display='none'});</script>
+  <title>King County Survival Guide — Harbor &amp; Vale LLC (Demo)</title>
+
+  <!-- Social preview -->
+  <meta property="og:title" content="King County Survival Guide — Harbor & Vale LLC">
+  <meta property="og:description" content="A fast, culturally competent guide to real services in King County. Know more. Navigate better.">
+  <meta property="og:url" content="https://app.harborandvale.com/">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://app.harborandvale.com/static/logo.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="King County Survival Guide — Harbor & Vale LLC">
+  <meta name="twitter:description" content="A fast, culturally competent guide to real services in King County. Know more. Navigate better.">
+  <meta name="twitter:image" content="https://app.harborandvale.com/static/logo.png">
+
   <style>
-    :root{--bg1:#0b0c1e;--bg2:#1a1540;--card:rgba(255,255,255,.06);--border:rgba(255,255,255,.12);--text:#f2f2f7;--muted:#b8b8d9;--pink:#ff71ce;--cyan:#01cdfe;--shadow:0 8px 28px rgba(0,0,0,.35)}
-    body.hc{--bg1:#000;--bg2:#000;--card:rgba(255,255,255,.15);--border:rgba(255,255,255,.6);--text:#fff;--muted:#eee}
-    body{font-family:system-ui,Arial,sans-serif;color:var(--text);background:radial-gradient(1200px 800px at 20% -10%, #2a1b59 0%, transparent 60%),radial-gradient(1000px 700px at 120% 20%, #0b3d91 0%, transparent 55%),linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);max-width:980px;margin:24px auto;padding:0 16px;line-height:1.5}
-    h1,h2,h3{color:var(--text)} .muted{color:var(--muted);margin:0}
-    .card{border:1px solid var(--border);border-radius:14px;padding:16px;margin:12px 0;background:var(--card);box-shadow:var(--shadow)}
-    .pill{font-size:12px;border:1px solid var(--border);border-radius:999px;padding:4px 10px;color:var(--muted);background:var(--card);backdrop-filter:blur(6px)}
-    .row{display:flex;gap:12px;flex-wrap:wrap}.row>*{flex:1 1 200px}.row>button{flex:0 0 auto}
-    button{padding:10px 14px;border-radius:12px;border:1px solid var(--border);cursor:pointer;background:linear-gradient(135deg,var(--pink),var(--cyan));color:#0b0c1e;font-weight:600;white-space:nowrap}
-    input,select,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.06);color:var(--text)}
-    .badge{display:inline-block;padding:2px 8px;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,.08);font-size:12px;margin-right:8px}
-    .hero{position:relative}.glow{position:absolute;left:50%;top:-30px;transform:translateX(-50%);width:720px;height:220px;background:radial-gradient(closest-side, var(--pink), transparent 60%),radial-gradient(closest-side, var(--cyan), transparent 65%);filter:blur(50px);opacity:.45;pointer-events:none;z-index:0}
-    .toolbar{display:flex;gap:8px;align-items:center;margin-left:auto}
-    details>summary{cursor:pointer}
-    #output{white-space:pre-wrap;display:none}
-    #offline{display:none;margin:8px 0}
-  </style>
-</head>
-<body>
-  <div id="offline" class="pill">You’re offline. Showing cached content.</div>
-  <div class="hero">
-    <div class="glow"></div>
-    <header style="display:flex;align-items:center;gap:16px;margin-bottom:12px;position:relative;z-index:1">
-      <img src="{{ url_for('static', filename='logo.png') }}" alt="Harbor &amp; Vale LLC" style="height:112px;width:auto">
-      <div>
-        <h1 style="margin:0;font-size:2rem">King County Survival Guide</h1>
-        <p class="muted" style="margin:2px 0 0 0">Know More. Navigate Better.</p>
-        {% if partner %}<span class="pill">Partner: {{ partner }}</span>{% endif %}
-      </div>
-      <div class="toolbar">
-        <span class="pill">DEMO</span>
-        <a href="/map"><button type="button">Map</button></a>
-        <a href="/safety"><button type="button">Safety</button></a>
-        <a href="/privacy"><button type="button">Privacy</button></a>
-        <a href="/profile"><button type="button">My profile</button></a>
-        <select id="lang" onchange="selectLang(this.value)"><option value="en" selected>EN</option><option value="es">ES</option></select>
-        <button onclick="toggleContrast()" title="High contrast">High contrast</button>
-        <a href="https://www.google.com" onclick="track('quick_exit','',{})"><button type="button">Quick exit</button></a>
-      </div>
-    </header>
-  </div>
-
-  <div class="card">
-    <h2>How this guide helps</h2>
-    <ul>
-      <li><strong>Not just a directory:</strong> quick filters + guided intake suggest services you can actually use.</li>
-      <li><strong>Tap to act:</strong> Call, Website, Directions, “Add to queue.”</li>
-      <li><strong>Respect &amp; choice:</strong> share only what you want—no sensitive health info required.</li>
-    </ul>
-    <div class="row">
-      <a href="tel:988" onclick="track('call_click','988',{})"><button>Call 988</button></a>
-      <a href="tel:211" onclick="track('call_click','211',{})"><button>Call 211</button></a>
-      <a href="/guided" onclick="track('guided_start','',{})"><button>Start Guided Intake (beta)</button></a>
-      <a href="/login"><button type="button">Case dashboard</button></a>
-    </div>
-  </div>
-
-  <div class="card" id="quick-actions">
-    <h2>Quick Actions</h2>
-    <div class="row">
-      <button onclick="loadServices()">See Nearby Services</button>
-      <button onclick="triage('I need housing')">AI: I need housing</button>
-      <button onclick="triage('I need medical')">AI: I need medical</button>
-      <button onclick="loadServicesFiltered('Clinic')">Clinics</button>
-      <button onclick="loadServicesFiltered('Shelter')">Shelters</button>
-    </div>
-
-    <div class="row" style="margin-top:8px">
-      <input id="q" placeholder="Search (e.g., showers, IDs, meals, transit)" />
-      <button onclick="loadServicesQuery()">Search</button>
-      <button onclick="clearSearch()">Clear</button>
-    </div>
-
-    <details style="margin-top:8px">
-      <summary class="pill">More filters (age, LGBTQIA+, language, disability, tribal)</summary>
-      <div class="row" style="margin-top:8px">
-        <select id="hood"><option value="">All neighborhoods</option></select>
-        <label class="pill" style="display:flex;align-items:center;gap:6px"><input id="walkin" type="checkbox"> Walk-in only</label>
-        <input id="age" type="number" min="0" placeholder="Age (optional)">
-      </div>
-      <div class="row" style="margin-top:8px">
-        <label class="pill" style="display:flex;align-items:center;gap:6px"><input id="lgbtq" type="checkbox"> LGBTQIA+ affirming</label>
-        <select id="language">
-          <option value="">Any language</option>
-          <option>English</option><option>Español</option>
-          <option>Chinese</option><option>Vietnamese</option><option>Somali</option>
-          <option>Russian</option><option>Amharic</option>
-          <option>ASL</option><option>Korean</option>
-          <option>Lushootseed</option><option>Sahaptin</option>
-        </select>
-        <select id="disability">
-          <option value="">Any accessibility</option>
-          <option>Wheelchair</option><option>ASL</option><option>Braille</option>
-          <option>Large Print</option><option>Sensory-friendly</option><option>Service animals</option>
-        </select>
-        <label class="pill" style="display:flex;align-items:center;gap:6px"><input id="tribal" type="checkbox"> Tribal-friendly</label>
-        <label class="pill" style="display:flex;align-items:center;gap:6px"><input id="tribe_run" type="checkbox"> Tribe-run</label>
-      </div>
-      <div class="row" style="margin-top:8px">
-        <button onclick="applyFilters()">Apply filters</button>
-      </div>
-    </details>
-
-    <div id="loading" class="pill" style="display:none;margin-top:8px">Loading…</div>
-    <div id="cards"></div>
-    <pre id="output" class="card"></pre>
-  </div>
-
-  <div class="card">
-    <h2>Contact / Intake (Demo)</h2>
-    <form id="demoForm" onsubmit="submitForm(event)">
-      <div class="row">
-        <input name="name" placeholder="Your preferred name (optional)"/>
-        <input name="need" placeholder="What do you need? (e.g., housing, ID, meal)"/>
-      </div>
-      <div class="row">
-        <input name="pronouns" placeholder="Pronouns (optional)"/>
-        <input name="contact"  placeholder="Preferred contact (optional)"/>
-      </div>
-      <textarea name="details" rows="3" placeholder="Add any details you want to share (optional)"></textarea>
-      <div style="margin-top:12px"><button type="submit">Submit</button></div>
-    </form>
-    <p class="muted">Demo only. No PHI; call 211 / 911 / 988 as needed.</p>
-  </div>
-
-  <footer class="muted" style="margin-top:28px;font-size:12px">
-    © Harbor &amp; Vale LLC — demo. <a href="/assist/deaf">Deaf/HH help</a> • <a href="/assist/blind">Blind/low-vision help</a>
-  </footer>
-
-<script>
-  function selectLang(v){ track('lang_select', v, {}); if(v==='es') alert('UI labels en Español coming in the next pass.'); }
-  function toggleContrast(){ document.body.classList.toggle('hc'); track('contrast_toggle', document.body.classList.contains('hc')?'on':'off', {}); }
-
-  const out = (data) => { const el = document.getElementById('output'); if(el){ el.style.display='block'; el.textContent = JSON.stringify(data,null,2); } };
-  function setLoading(on,msg){ const el=document.getElementById('loading'); if(!el)return; el.style.display=on?'inline-block':'none'; el.textContent=msg||'Loading…'; }
-
-  async function track(type,name,meta){ try{ await fetch('/event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type,name,meta})}); }catch(_){} }
-
-  function cardHTML(s){
-    const maps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.address || s.name)}`;
-    const tel  = s.phone ? `tel:${s.phone.replace(/[^+\\d]/g,'')}` : null;
-    const walk = s.walk_in ? `<span class="badge">Walk-in</span>` : ``;
-    const hours= s.hours ? `<span class="badge">${s.hours}</span>` : ``;
-    const lgbt = s.lgbtq_friendly ? `<span class="badge">LGBTQIA+ affirming</span>` : ``;
-    const tribal = s.tribal_friendly ? `<span class="badge">Tribal-friendly</span>` : ``;
-    const tribeRun = s.tribe_run ? `<span class="badge">Tribe-run</span>` : ``;
-    const acc = (s.disability_access||[]).map(a=>`<span class="badge">${a}</span>`).join('');
-    const langs = (s.languages||[]).map(a=>`<span class="badge">${a}</span>`).join('');
-    const safeName=(s.name||'').replace(/'/g,"\\'");
-    const addrJS=(s.address||'').replace(/'/g,"\\'");
-    return `
-      <div class="card">
-        <div style="margin-bottom:6px">${walk}${hours}${lgbt}${tribal}${tribeRun}${acc}${langs}</div>
-        <h3 style="margin:0 0 4px 0">${s.name}</h3>
-        <p class="muted">${s.type || ''} • ${s.neighborhood || 'Seattle'}</p>
-        ${s.notes ? `<p>${s.notes}</p>` : ''}
-        <div class="row" style="margin-top:8px">
-          ${tel?`<a href="${tel}" onclick="track('call_click','${safeName}',{})"><button>Call</button></a>`:''}
-          ${s.website?`<a target="_blank" rel="noopener" href="${s.website}" onclick="track('website_click','${safeName}',{})"><button>Website</button></a>`:''}
-          <a target="_blank" rel="noopener" href="${maps}" onclick="track('directions_click','${safeName}',{})"><button>Directions</button></a>
-          ${s.address?`<button onclick="copyAddr('${addrJS}','${safeName}')">Copy address</button>`:''}
-          <a href="/s/${s.slug}"><button type="button">Details</button></a>
-          <button onclick="referService('${safeName}')">Add to queue</button>
-        </div>
-
-        <details style="margin-top:8px">
-          <summary class="pill">Report incorrect info</summary>
-          <div class="row" style="margin-top:8px">
-            <select id="rep-cat-${s.slug}">
-              <option>Address</option><option>Hours</option><option>Phone</option><option>Website</option><option>Closed</option><option>Other</option>
-            </select>
-            <input id="rep-email-${s.slug}" placeholder="Your email (optional)" />
-          </div>
-          <textarea id="rep-text-${s.slug}" rows="2" placeholder="Describe the fix (e.g., new hours, new address)…"></textarea>
-          <div style="margin-top:8px">
-            <button onclick="reportIssue('${s.slug}','${safeName}')">Send</button>
-          </div>
-        </details>
-      </div>
-    `;
-  }
-
-  function renderCards(list){
-    const el = document.getElementById('cards');
-    el.innerHTML = (Array.isArray(list) && list.length) ? list.map(cardHTML).join('') :
-      `<div class="card"><p class="muted">No matching results. Try removing a filter or different search.</p></div>`;
-  }
-
-  function copyAddr(addr,name){ try{ navigator.clipboard.writeText(addr); setLoading(true,'Address copied'); setTimeout(()=>setLoading(false),700); track('copy_address',name,{});}catch(e){ out({error:String(e)}) } }
-
-  async function reportIssue(slug,name){
-    const cat=document.getElementById('rep-cat-'+slug)?.value||'Other';
-    const txt=document.getElementById('rep-text-'+slug)?.value||'';
-    const em =document.getElementById('rep-email-'+slug)?.value||'';
-    try{
-      await fetch('/report',{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({slug,service:name,category:cat,suggestion:txt,email:em})});
-      setLoading(true,'Thanks! We received your report.'); setTimeout(()=>setLoading(false),1000);
-    }catch(e){ out({error:String(e)}) }
-  }
-
-  async function referService(serviceName){
-    setLoading(true,'Adding to queue…');
-    try{
-      const clientName=document.querySelector('input[name="name"]')?.value||'';
-      await fetch('/refer',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({service:serviceName,client_name:clientName})});
-      setLoading(true,'Added to queue'); setTimeout(()=>setLoading(false),800);
-    }catch(e){ out({error:String(e)}); setLoading(false); }
-  }
-
-  async function loadServices(){ await _load('/services','all'); }
-  async function loadServicesFiltered(kind){ await _load('/services?type='+encodeURIComponent(kind),kind); }
-  async function loadServicesQuery(){
-    const term=(document.getElementById('q')?.value||'').trim();
-    await _load(term?('/services?q='+encodeURIComponent(term)):'/services', term||'all');
-  }
-  async function applyFilters(){
-    const p=[]; const hood=document.getElementById('hood')?.value||'';
-    if(hood) p.push('neighborhood='+encodeURIComponent(hood));
-    if(document.getElementById('walkin')?.checked) p.push('walk_in=true');
-    const age=document.getElementById('age')?.value||'';
-    if(age) p.push('age='+encodeURIComponent(age));
-    if(document.getElementById('lgbtq')?.checked) p.push('lgbtq=true');
-    const lang=document.getElementById('language')?.value||''; if(lang) p.push('language='+encodeURIComponent(lang));
-    const dis=document.getElementById('disability')?.value||''; if(dis) p.push('disability='+encodeURIComponent(dis));
-    if(document.getElementById('tribal')?.checked) p.push('tribal=true');
-    if(document.getElementById('tribe_run')?.checked) p.push('tribe_run=true');
-    await _load('/services'+(p.length?('?'+p.join('&')):''), 'filters');
-  }
-
-  async function _load(url,label){
-    setLoading(true,'Loading…');
-    try{
-      let res=await fetch(url,{cache:'no-store'});
-      if(!res.ok){ await new Promise(r=>setTimeout(r,500)); res=await fetch(url,{cache:'no-store'}); }
-      const txt=await res.text();
-      try{ const data=JSON.parse(txt); renderCards(data); track('filter',label,{}); }
-      catch(err){ out({error:'Failed to parse JSON',status:res.status,raw:txt.slice(0,400)}) }
-    }catch(e){ out({error:String(e)}) } finally{ setLoading(false); }
-  }
-
-  async function populateNeighborhoods(){
-    try{
-      const select=document.getElementById('hood'); if(!select) return;
-      const res=await fetch('/services',{cache:'no-store'}); const data=await res.json();
-      const uniq=[...new Set((data||[]).map(s=>s.neighborhood).filter(Boolean))].sort();
-      select.innerHTML = '<option value="">All neighborhoods</option>' + uniq.map(n=>`<option>${n}</option>`).join('');
-    }catch(_){}
-  }
-  document.addEventListener('DOMContentLoaded', populateNeighborhoods);
-
-  async function triage(message){
-    setLoading(true,'Thinking…');
-    try{
-      const res=await fetch('/ai_triage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message})});
-      const txt=await res.text(); try{ out(JSON.parse(txt)); } catch(err){ out({error:String(err),raw:txt.slice(0,300)}) }
-    }catch(e){ out({error:String(e)}) } finally{ setLoading(false); }
-  }
-
-  async function submitForm(e){
-    e.preventDefault();
-    const form=new FormData(document.getElementById('demoForm'));
-    const res=await fetch('/submit_form',{method:'POST',body:form});
-    out(await res.json());
-  }
-</script>
-</body>
-</html>
+    :root{
+      --bg1:#0b0c1e; --bg2:#1a1540;
+      --brand:#1E4B7A; --accent:#CFAE70;
+    }
+    /* Vaporwave background */
+    body{
+      background:
+        radial-gradient(1200px 800px at 20% -10%, #2a1b59 0%, transparent 60%),
+        radial-gradient(1000px 700px at 120% 20%, #0b3d91 0%, transparent 55%),
+        linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
+      color:#f2f2f7; font-family:system-ui, Arial, sans-serif;
+      max-width: 940px; margin: 24px auto; padding: 0 16px; line-height:1.45;
+    }
+    header{position:relative; margin:0 0 12px 0;}
+    .glow{
+      position:absolute; inset: -40px 0 auto 0; height:180px; z-index:0;
+      filter: blur(60px); opacity:.55; pointer-events:none;
+      background:
+        radial-gradient(circle at 30% 50%, #ff71ce, transparent 60%),
+        radial-gradient(circle at 70% 40%, #01cdfe, transparent 60%);
+    }
+    .hero{
+      position:relative; z-index:1; display:flex; align-items:center; gap:14px;
+    }
+    h1{margin:0; font-size:28px;}
+    .muted{color:#cfd3ffcc; margin:2px 0 0;}
+    .pill{display:inline-block; font-size:12px; border:1px solid #ffffff2a; border-radius:999px; padding:4px 10px; background:#ffffff14; color:#fff;}
+    .card{border:1px solid #ffffff26; border-radius:14px; padding:16px; margin:12px 0; background:#ffffff14; box-shadow:0 8px 30px rgba(0,0,0,.12);}
+    .row{display:flex; gap:10px; flex-wrap:wrap}
+    button{padding:10px 14px; border-radius:10px; border:1px solid #ffffff26; cursor:pointer; background:linear-gradient(90deg,#ff71ce,#01cdfe); color:#101018; font-weight:600}
+    button:hover{opacity:.92}
+    input, textarea, select{background:#ffffff12; color:#fff; border:1px solid #ffffff26; border-radius:10px; padding:10px; width:100%}
+    a {color:#e3e8ff; text-decoration: none;}
+    .toolbar{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:10px 0 16px}
+    .service-card h3{margin:0 0 4px 0}
+    .service-meta{colo
 
