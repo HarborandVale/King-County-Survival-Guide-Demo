@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sign in – Harbor &amp; Vale</title>
+  <style>
+    body{font-family:system-ui,Arial,sans-serif;max-width:480px;margin:64px auto;padding:0 16px;color:#222}
+    .card{border:1px solid #ddd;border-radius:12px;padding:16px}
+    label{display:block;margin:8px 0 4px}
+    input{width:100%;padding:10px;border-radius:10px;border:1px solid #ccc}
+    button{margin-top:12px;padding:10px 14px;border-radius:10px;border:1px solid #ddd;background:#1E4B7A;color:#fff;cursor:pointer}
+    .err{color:#b00020;margin-top:8px}
+    .muted{color:#666;font-size:12px}
+  </style>
+</head>
+<body>
+  <h1>Case Manager Login</h1>
+  <div class="card">
+    <form method="POST">
+      <label for="password">Password (demo)</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required />
+      <button type="submit">Sign in</button>
+      {% if error %}<div class="err">{{ error }}</div>{% endif %}
+    </form>
+    <p class="muted">Demo access only. No PHI should be entered. Use respectful, person-first notes.</p>
+  </div>
+</body>
+</html>
