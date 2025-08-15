@@ -133,6 +133,20 @@
       <button onclick="loadServicesQuery()">Search</button>
       <button onclick="clearSearch()">Clear</button>
     </div>
+    <!-- Filters row: Neighborhood + Walk-in -->
+<div class="row" style="margin-top:8px">
+  <select id="hood">
+    <option value="">All neighborhoods</option>
+    <!-- options will be filled automatically -->
+  </select>
+
+  <label class="pill" style="display:flex;align-items:center;gap:6px">
+    <input id="walkin" type="checkbox" style="transform:translateY(1px)"> Walk-in only
+  </label>
+
+  <button onclick="applyFilters()">Apply filters</button>
+</div>
+
 
     <!-- Loading indicator -->
     <div id="loading" class="pill" style="display:none;margin-top:8px">Loading…</div>
@@ -283,6 +297,50 @@
     document.getElementById('cards').innerHTML = '';
     document.getElementById('output').style.display = 'none';
   }
+<!-- Build filters from the controls and fetch -->
+async function applyFilters(){
+  const hood = (document.getElementById('hood')?.value || '').trim();
+  const walk = document.getElementById('walkin')?.checked ? 'true' : '';
+
+  let url = '/services';
+  const params = [];
+  if (hood) params.push('neighborhood=' + encodeURIComponent(hood));
+  if (walk) params.push('walk_in=true');
+  if (params.length) url += '?' + params.join('&');
+
+  setLoading(true, params.length ? 'Applying filters…' : 'Loading services…');
+  try{
+    let res = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) {
+      await new Promise(r => setTimeout(r, 600));
+      res = await fetch(url, { cache: 'no-store' });
+    }
+    const txt = await res.text();
+    try { renderCards(JSON.parse(txt)); }
+    catch (parseErr) { out({ error: 'Failed to parse JSON', status: res.status, raw: txt.slice(0, 400) }); }
+  }catch(e){
+    out({ error: String(e) });
+  }finally{
+    setLoading(false);
+  }
+}
+
+/* Populate the Neighborhood dropdown from the service data */
+async function populateNeighborhoods(){
+  try{
+    const select = document.getElementById('hood');
+    if (!select) return;
+    const res = await fetch('/services', { cache: 'no-store' });
+    const data = await res.json();
+    const uniq = Array.from(new Set((data || []).map(s => s.neighborhood).filter(Boolean))).sort();
+    const opts = uniq.map(n => `<option value="${n}">${n}</option>`).join('');
+    const first = select.querySelector('option')?.outerHTML || '<option value="">All neighborhoods</option>';
+    select.innerHTML = first + opts;
+  }catch(e){ /* non-fatal */ }
+}
+
+/* Run on page load */
+document.addEventListener('DOMContentLoaded', populateNeighborhoods);
 
   // AI triage (robust parsing + loading)
   async function triage(message){
