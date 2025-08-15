@@ -42,8 +42,9 @@
 <button onclick="triage('I need medical')">AI: I need medical</button>
     </div>
     <p class="muted">These call demo endpoints to show flow. No real data yet.</p>
-   <div id="cards"></div>
+  <div id="cards"></div>
 <pre id="output" class="card" style="display:none"></pre>
+
 
   </div>
 
@@ -67,77 +68,84 @@
   </footer>
 
 <script>
+  // Show debug output (and make it visible if hidden)
   const out = (data) => {
-    document.getElementById('output').textContent = JSON.stringify(data, null, 2);
+    const el = document.getElementById('output');
+    if (el) {
+      el.style.display = 'block';
+      el.textContent = JSON.stringify(data, null, 2);
+    }
   };
 
+  // Surface any JavaScript errors to the page (so nothing fails silently)
+  window.onerror = function(msg, src, line, col, err){
+    out({ js_error: String(msg), src, line, col, stack: err && err.stack });
+    return false;
+  };
+
+  // Render service "cards" with Call / Website / Directions
   function renderCards(list){
-  const el = document.getElementById('cards');
-  if (!Array.isArray(list)) { out({error:"Expected array"}); return; }
-  el.innerHTML = list.map(s => {
-    const maps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.address || s.name)}`;
-    const tel  = s.phone ? `tel:${s.phone.replace(/[^+\d]/g,'')}` : null;
-    return `
-      <div class="card">
-        <h3>${s.name}</h3>
-        <p class="muted">${s.type || ''} • ${s.neighborhood || 'Seattle'} • ${s.hours || ''}</p>
-        ${s.notes ? `<p>${s.notes}</p>` : ''}
-        <div class="row">
-          ${tel ? `<a href="${tel}"><button>Call</button></a>` : ''}
-          ${s.website ? `<a target="_blank" rel="noopener" href="${s.website}"><button>Website</button></a>` : ''}
-          <a target="_blank" rel="noopener" href="${maps}"><button>Directions</button></a>
+    const el = document.getElementById('cards');
+    if (!el) { out({error:"Missing #cards container"}); return; }
+    if (!Array.isArray(list)) { out({error:"Expected array", got: typeof list}); return; }
+
+    el.innerHTML = list.map(s => {
+      const maps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.address || s.name)}`;
+      const tel  = s.phone ? `tel:${s.phone.replace(/[^+\d]/g,'')}` : null;
+      return `
+        <div class="card">
+          <h3>${s.name}</h3>
+          <p class="muted">${s.type || ''} • ${s.neighborhood || 'Seattle'} • ${s.hours || ''}</p>
+          ${s.notes ? `<p>${s.notes}</p>` : ''}
+          <div class="row">
+            ${tel ? `<a href="${tel}"><button>Call</button></a>` : ''}
+            ${s.website ? `<a target="_blank" rel="noopener" href="${s.website}"><button>Website</button></a>` : ''}
+            <a target="_blank" rel="noopener" href="${maps}"><button>Directions</button></a>
+          </div>
         </div>
-      </div>
-    `;
-  }).join('');
-}
-
-async function loadServices(){
-  try{
-    const res = await fetch('/services');
-    const data = await res.json();
-    renderCards(data);
-  }catch(e){
-    out({ error: String(e) });
-  }
-}
-
+      `;
+    }).join('');
   }
 
- async function triage(message){
-  try{
-    const res = await fetch('/ai_triage', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ message })
-    });
-
-    // Read raw text first so we can debug if it's not valid JSON
-    const txt = await res.text();
-
-    try {
-      const data = JSON.parse(txt);
-      out(data);
-    } catch (parseErr) {
-      // Show useful debug info if the response wasn't JSON
-      out({
-        error: String(parseErr),
-        status: res.status,
-        raw: txt.slice(0, 300)  // first 300 chars only
-      });
+  // Load services and render as cards
+  async function loadServices(){
+    try{
+      const res = await fetch('/services');
+      const data = await res.json();
+      renderCards(data);
+    }catch(e){
+      out({ error: String(e) });
     }
-  } catch(e){
-    out({ error: String(e) });
   }
-}
 
+  // Keep the AI triage with robust JSON handling
+  async function triage(message){
+    try{
+      const res = await fetch('/ai_triage', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ message })
+      });
+      const txt = await res.text();
+      try {
+        const data = JSON.parse(txt);
+        out(data);
+      } catch (parseErr) {
+        out({ error: String(parseErr), status: res.status, raw: txt.slice(0, 300) });
+      }
+    } catch(e){
+      out({ error: String(e) });
+    }
+  }
 
+  // Demo form submit
   async function submitForm(e){
     e.preventDefault();
     const form = new FormData(document.getElementById('demoForm'));
-    const res = await fetch('/submit_form',{method:'POST',body:form});
+    const res = await fetch('/submit_form',{ method:'POST', body: form });
     out(await res.json());
   }
 </script>
+
 </body>
 </html>
