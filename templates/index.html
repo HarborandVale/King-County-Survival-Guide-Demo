@@ -1,56 +1,59 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>King County Survival Guide — Harbor &amp; Vale LLC (Demo)</title>
-
-  <!-- Social preview -->
-  <meta property="og:title" content="King County Survival Guide — Harbor & Vale LLC">
-  <meta property="og:description" content="A fast, culturally competent guide to real services in King County. Know more. Navigate better.">
-  <meta property="og:url" content="https://app.harborandvale.com/">
-  <meta property="og:type" content="website">
-  <meta property="og:image" content="https://app.harborandvale.com/static/logo.png">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="King County Survival Guide — Harbor & Vale LLC">
-  <meta name="twitter:description" content="A fast, culturally competent guide to real services in King County. Know more. Navigate better.">
-  <meta name="twitter:image" content="https://app.harborandvale.com/static/logo.png">
-
-  <style>
-    :root{
-      --bg1:#0b0c1e; --bg2:#1a1540;
-      --brand:#1E4B7A; --accent:#CFAE70;
-    }
-    /* Vaporwave background */
-    body{
-      background:
-        radial-gradient(1200px 800px at 20% -10%, #2a1b59 0%, transparent 60%),
-        radial-gradient(1000px 700px at 120% 20%, #0b3d91 0%, transparent 55%),
-        linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
-      color:#f2f2f7; font-family:system-ui, Arial, sans-serif;
-      max-width: 940px; margin: 24px auto; padding: 0 16px; line-height:1.45;
-    }
-    header{position:relative; margin:0 0 12px 0;}
-    .glow{
-      position:absolute; inset: -40px 0 auto 0; height:180px; z-index:0;
-      filter: blur(60px); opacity:.55; pointer-events:none;
-      background:
-        radial-gradient(circle at 30% 50%, #ff71ce, transparent 60%),
-        radial-gradient(circle at 70% 40%, #01cdfe, transparent 60%);
-    }
-    .hero{
-      position:relative; z-index:1; display:flex; align-items:center; gap:14px;
-    }
-    h1{margin:0; font-size:28px;}
-    .muted{color:#cfd3ffcc; margin:2px 0 0;}
-    .pill{display:inline-block; font-size:12px; border:1px solid #ffffff2a; border-radius:999px; padding:4px 10px; background:#ffffff14; color:#fff;}
-    .card{border:1px solid #ffffff26; border-radius:14px; padding:16px; margin:12px 0; background:#ffffff14; box-shadow:0 8px 30px rgba(0,0,0,.12);}
-    .row{display:flex; gap:10px; flex-wrap:wrap}
-    button{padding:10px 14px; border-radius:10px; border:1px solid #ffffff26; cursor:pointer; background:linear-gradient(90deg,#ff71ce,#01cdfe); color:#101018; font-weight:600}
-    button:hover{opacity:.92}
-    input, textarea, select{background:#ffffff12; color:#fff; border:1px solid #ffffff26; border-radius:10px; padding:10px; width:100%}
-    a {color:#e3e8ff; text-decoration: none;}
-    .toolbar{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:10px 0 16px}
-    .service-card h3{margin:0 0 4px 0}
-    .service-meta{colo
-
+[
+  {
+    "id": "shelter-1",
+    "name": "Lake Union Women's Shelter",
+    "type": "Shelter",
+    "address": "123 Pine St, Seattle, WA",
+    "neighborhood": "Downtown",
+    "phone": "(206) 555-1212",
+    "email": "",
+    "hours": "Intake 4–8pm",
+    "website": "https://example.org/shelter",
+    "notes": "ID preferred; LGBTQ+ inclusive",
+    "tags": ["LGBTQ+ safe", "Wheelchair access", "Open tonight"],
+    "services": ["Shelter"],
+    "distance": "1.0 mi",
+    "walk_in": true,
+    "beds": 3,
+    "lastVerified": "2025-08-14",
+    "photo": ""
+  },
+  {
+    "id": "day-1",
+    "name": "Aurora Day Center",
+    "type": "Day Center",
+    "address": "8600 Aurora Ave N, Seattle, WA",
+    "neighborhood": "North Seattle",
+    "phone": "(206) 555-3434",
+    "email": "",
+    "hours": "8am–6pm daily",
+    "website": "https://example.org/daycenter",
+    "notes": "Showers, laundry, mail",
+    "tags": ["Showers", "Mail service", "Open today"],
+    "services": ["Day Center", "Showers", "Laundry"],
+    "distance": "4.2 mi",
+    "walk_in": true,
+    "beds": null,
+    "lastVerified": "2025-08-12",
+    "photo": ""
+  },
+  {
+    "id": "clinic-1",
+    "name": "Harbor Free Clinic",
+    "type": "Clinic",
+    "address": "500 Broadway E, Seattle, WA",
+    "neighborhood": "Capitol Hill",
+    "phone": "(206) 555-4545",
+    "email": "hello@harborclinic.org",
+    "hours": "Walk-ins Wed/Fri 1–5pm",
+    "website": "https://example.org/clinic",
+    "notes": "MAT referrals; naloxone on site",
+    "tags": ["Low-cost/Free", "Open today"],
+    "services": ["Primary Care", "Behavioral Health", "SUD"],
+    "distance": "2.1 mi",
+    "walk_in": true,
+    "beds": null,
+    "lastVerified": "2025-08-14",
+    "photo": ""
+  }
+]
