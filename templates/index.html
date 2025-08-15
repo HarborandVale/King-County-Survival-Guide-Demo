@@ -76,16 +76,33 @@
     }catch(e){ out({error:String(e)}) }
   }
 
-  async function triage(message){
-    try{
-      const res = await fetch('/ai_triage',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({message})
+ async function triage(message){
+  try{
+    const res = await fetch('/ai_triage', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ message })
+    });
+
+    // Read raw text first so we can debug if it's not valid JSON
+    const txt = await res.text();
+
+    try {
+      const data = JSON.parse(txt);
+      out(data);
+    } catch (parseErr) {
+      // Show useful debug info if the response wasn't JSON
+      out({
+        error: String(parseErr),
+        status: res.status,
+        raw: txt.slice(0, 300)  // first 300 chars only
       });
-      out(await res.json());
-    }catch(e){ out({error:String(e)}) }
+    }
+  } catch(e){
+    out({ error: String(e) });
   }
+}
+
 
   async function submitForm(e){
     e.preventDefault();
