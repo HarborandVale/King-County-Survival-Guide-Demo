@@ -20,7 +20,7 @@
 <body>
   <h1>Harbor &amp; Vale — Case Manager Dashboard</h1>
   <p class="muted">Trauma-informed practice: use person-first language; avoid PHI; prioritize consent and safety.</p>
-  <p><a href="/logout">Sign out</a></p>
+  <p><a href="/logout">Sign out</a> • <a href="/export.csv">Export CSV</a></p>
 
   <div class="row">
     <div class="card">
@@ -52,7 +52,7 @@
     </div>
 
     <div class="card">
-      <h2>Analytics</h2>
+      <h2>Analytics ({{ totals.events }} events)</h2>
       <p>
         {% for k,v in totals.counts.items() %}
           <span class="pill">{{ k }}: {{ v }}</span>
@@ -70,3 +70,4 @@
   </div>
 </body>
 </html>
+
