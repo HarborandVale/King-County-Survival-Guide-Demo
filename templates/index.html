@@ -215,15 +215,31 @@
       out({ error: String(e) });
     }
   }
+<!-- REPLACE your old loadServicesFiltered with this -->
 async function loadServicesFiltered(kind){
   try{
-    const res = await fetch('/services?type=' + encodeURIComponent(kind));
-    const data = await res.json();
-    renderCards(data);
-  }catch(e){
+    // First try (avoid cached responses)
+    let res = await fetch('/services?type=' + encodeURIComponent(kind), { cache: 'no-store' });
+
+    // If server hiccups (e.g., 502), retry once after a short pause
+    if (!res.ok) {
+      await new Promise(r => setTimeout(r, 600));
+      res = await fetch('/services?type=' + encodeURIComponent(kind), { cache: 'no-store' });
+    }
+
+    // Read raw text first, then parse (so we can show useful errors)
+    const txt = await res.text();
+    try {
+      const data = JSON.parse(txt);
+      renderCards(data);
+    } catch (parseErr) {
+      out({ error: 'Failed to parse JSON', status: res.status, raw: txt.slice(0, 400) });
+    }
+  } catch(e){
     out({ error: String(e) });
   }
 }
+
 
   // Keep the AI triage with robust JSON handling
   async function triage(message){
