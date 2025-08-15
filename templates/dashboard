@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard – Harbor &amp; Vale</title>
+  <style>
+    body{font-family:system-ui,Arial,sans-serif;max-width:980px;margin:24px auto;padding:0 16px;color:#222}
+    h1,h2{margin:6px 0}
+    .row{display:flex;gap:16px;flex-wrap:wrap}
+    .card{flex:1 1 300px;border:1px solid #ddd;border-radius:12px;padding:16px}
+    table{width:100%;border-collapse:collapse}
+    th,td{border-bottom:1px solid #eee;padding:8px;text-align:left;vertical-align:top}
+    .pill{display:inline-block;border:1px solid #ccc;border-radius:999px;padding:2px 8px;font-size:12px;margin-right:6px}
+    .muted{color:#666}
+    button{padding:8px 12px;border-radius:10px;border:1px solid #ddd;background:#1E4B7A;color:#fff;cursor:pointer}
+    form{display:inline}
+  </style>
+</head>
+<body>
+  <h1>Harbor &amp; Vale — Case Manager Dashboard</h1>
+  <p class="muted">Trauma-informed practice: use person-first language; avoid PHI; prioritize consent and safety.</p>
+  <p><a href="/logout">Sign out</a></p>
+
+  <div class="row">
+    <div class="card">
+      <h2>Intake Queue</h2>
+      <table aria-label="Intake queue">
+        <thead><tr><th>ID</th><th>When (UTC)</th><th>Name</th><th>Need</th><th>Details</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody>
+          {% for i in intakes %}
+          <tr>
+            <td>{{ i.id }}</td>
+            <td>{{ i.ts }}</td>
+            <td>{{ i.name or "—" }}</td>
+            <td>{{ i.need }}</td>
+            <td>{{ i.details }}</td>
+            <td>{{ i.status }}</td>
+            <td>
+              {% if i.status != "resolved" %}
+              <form method="POST" action="/intake/resolve">
+                <input type="hidden" name="id" value="{{ i.id }}"/>
+                <button type="submit">Mark resolved</button>
+              </form>
+              {% else %}<span class="pill">Resolved</span>{% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% if not intakes %}<p class="muted">No intakes yet.</p>{% endif %}
+    </div>
+
+    <div class="card">
+      <h2>Analytics (last {{ totals.events }} events)</h2>
+      <p>
+        {% for k,v in totals.counts.items() %}
+          <span class="pill">{{ k }}: {{ v }}</span>
+        {% endfor %}
+      </p>
+      <h3>Top Services Clicked</h3>
+      <ul>
+        {% for name,count in totals.top_services %}
+          <li>{{ name }} — {{ count }}</li>
+        {% endfor %}
+        {% if not totals.top_services %}<li class="muted">No clicks yet.</li>{% endif %}
+      </ul>
+      <p class="muted">Raw JSON at <a href="/analytics">/analytics</a></p>
+    </div>
+  </div>
+</body>
+</html>
