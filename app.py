@@ -45,18 +45,41 @@ def submit_form():
     return jsonify({"status": "success"})
 
 
-# ---------- Tier 2: Services (stub) ----------
-def fetch_services_from_api_stub():
-    # Replace with real data later; this is just a placeholder.
-    return [
-        {"name": "Shelter A", "beds": 2, "status": "Available"},
-        {"name": "Clinic B", "status": "Walk-ins Only"},
-    ]
+# ---------- Tier 2: Services (file-backed with simple filters + safe fallback) ----------
+def fetch_services_from_file(q=None, kind=None, neighborhood=None):
+    p = os.path.join(os.path.dirname(__file__), "services.json")
+
+    # Try to load from services.json; fall back to demo data if the file doesn't exist yet.
+    try:
+        with open(p, "r", encoding="utf-8") as f:
+            items = json.load(f)
+    except FileNotFoundError:
+        items = [
+            {"name": "Shelter A", "type": "Shelter", "neighborhood": "Downtown", "beds": 2, "status": "Available"},
+            {"name": "Clinic B", "type": "Clinic", "neighborhood": "Capitol Hill", "status": "Walk-ins Only"},
+        ]
+
+    # Apply simple filters
+    def match(x):
+        ok = True
+        if q:
+            ql = q.lower()
+            ok = ok and (ql in x.get("name","").lower() or ql in x.get("notes","").lower())
+        if kind:
+            ok = ok and (x.get("type","").lower() == kind.lower())
+        if neighborhood:
+            ok = ok and (x.get("neighborhood","").lower() == neighborhood.lower())
+        return ok
+
+    return [x for x in items if match(x)]
 
 @app.route("/services")
 def services():
-    items = fetch_services_from_api_stub()
-    return jsonify(items)
+    q = request.args.get("q")
+    kind = request.args.get("type")
+    hood = request.args.get("neighborhood")
+    return jsonify(fetch_services_from_file(q, kind, hood))
+
 
 
 # ---------- Tier 3: AI Triage (simple keyword logic) ----------
@@ -99,6 +122,7 @@ if __name__ == "__main__":
     test_ai_triage()
     # Local server for quick checks (Render will use gunicorn start command)
     app.run(host="0.0.0.0", port=5000, debug=False)
+
 
 
 
