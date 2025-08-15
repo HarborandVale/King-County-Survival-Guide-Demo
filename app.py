@@ -18,6 +18,9 @@ def enforce_https():
     if request.headers.get("X-Forwarded-Proto", "http") != "https":
         code = 301 if request.method in ("GET", "HEAD") else 307
         return redirect(request.url.replace("http://", "https://", 1), code=code)
+        @app.route("/robots.txt")
+def robots():
+    return "User-agent: *\nDisallow: /\n", 200, {"Content-Type": "text/plain"}
 
 # --------------------------------- Health & errors -----------------------------------
 @app.route("/health")
@@ -129,3 +132,4 @@ def services():
     walk = request.args.get("walk_in")
     walk_only = True if (walk and walk.lower() in ("1", "true", "yes")) else None
     return jsonify(fetch_services(q, kind, hood, walk_only))
+
