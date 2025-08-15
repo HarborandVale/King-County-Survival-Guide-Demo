@@ -1,14 +1,13 @@
 # Harbor & Vale — King County Survival Guide (Demo)
-# Tier 2 v1 (dashboard/intakes) + Tier 3 v1 (event logging/analytics) + cultural & safety guardrails.
+# Tier 2 v1 (dashboard/intakes) + Tier 3 v1 (event logging/analytics) + guided intake + safety/robots.
 
 from flask import Flask, request, jsonify, render_template, redirect, url_for, session, abort
 from werkzeug.middleware.proxy_fix import ProxyFix
-import os, json, time, threading
+import os, json, time, threading, csv, io
 from collections import deque
 from datetime import datetime
 
 app = Flask(__name__)
-# HTTPS trust for Render proxy
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 # --- Security/session config (demo-safe defaults if env not set) ---
@@ -19,22 +18,20 @@ app.config.update(
     SESSION_COOKIE_SECURE=True,  # Render uses HTTPS
 )
 
-DASHBOARD_PASSWORD = os.environ.get("DASHBOARD_PASSWORD", "letmein")  # change in Render
+DASHBOARD_PASSWORD = os.environ.get("DASHBOARD_PASSWORD", "letmein")  # set in Render
 
 # --- Simple in-memory stores (demo only; resets on redeploy) ---
 EVENTS = deque(maxlen=2000)   # [{ts, ip, type, name, meta}]
 INTAKES = deque(maxlen=500)   # [{id, ts, name, need, details, status}]
-_next_intake_id = {"v": 1}    # poor-man's counter
+_next_intake_id = {"v": 1}
 
 # --- Simple IP rate limit buckets: scope -> ip -> timestamps deque ---
 RATE = {}
 RATE_LOCK = threading.Lock()
-
 def check_rate(scope: str, ip: str, max_hits: int, window_sec: int) -> bool:
     now = time.time()
     with RATE_LOCK:
         bucket = RATE.setdefault(scope, {}).setdefault(ip, deque())
-        # drop old timestamps
         while bucket and now - bucket[0] > window_sec:
             bucket.popleft()
         if len(bucket) >= max_hits:
@@ -45,7 +42,7 @@ def check_rate(scope: str, ip: str, max_hits: int, window_sec: int) -> bool:
 # -------- HTTPS redirect (skip for /health & when debugging) ----------
 @app.before_request
 def enforce_https():
-    if app.debug or request.path == "/health":
+    if app.debug or request.path in ("/health", "/robots.txt"):
         return
     if request.headers.get("X-Forwarded-Proto", "http") != "https":
         code = 301 if request.method in ("GET", "HEAD") else 307
@@ -75,14 +72,19 @@ def server_error(e):
 def index():
     return render_template("index.html")
 
+@app.route("/guided")
+def guided():
+    return render_template("guided.html")
+
 @app.route("/submit_form", methods=["POST"])
 def submit_form():
     data = request.form.to_dict(flat=True)
     name = (data.get("name") or "").strip()[:120]
     need = (data.get("need") or "").strip()[:240]
     details = (data.get("details") or "").strip()[:800]
+    pronouns = (data.get("pronouns") or "").strip()[:40]
+    contact = (data.get("contact") or "").strip()[:160]
 
-    # Store minimal intake (no PHI; user controls what they share)
     iid = _next_intake_id["v"]; _next_intake_id["v"] += 1
     INTAKES.appendleft({
         "id": iid,
@@ -90,10 +92,30 @@ def submit_form():
         "name": name,
         "need": need,
         "details": details,
+        "pronouns": pronouns,
+        "contact": contact,
         "status": "new"
     })
     log_event("intake_submitted", name or "anonymous", {"need": need})
     return jsonify({"status": "success", "id": iid})
+
+@app.post("/refer")
+def refer_service():
+    data = request.get_json(silent=True) or {}
+    client_name = (data.get("client_name") or "").strip()[:120]
+    svc = (data.get("service") or "").strip()[:160]
+    notes = (data.get("notes") or "").strip()[:400]
+    iid = _next_intake_id["v"]; _next_intake_id["v"] += 1
+    INTAKES.appendleft({
+        "id": iid,
+        "ts": datetime.utcnow().isoformat(timespec="seconds") + "Z",
+        "name": client_name,
+        "need": f"Referral to: {svc}",
+        "details": notes,
+        "status": "new"
+    })
+    log_event("intake_submitted", client_name or "anonymous", {"via": "refer", "service": svc})
+    return jsonify({"ok": True, "id": iid})
 
 
 # ----------------------------------- Tier 2 -----------------------------------
@@ -118,10 +140,16 @@ def load_services():
              "hours": "Intake 4–8pm", "walk_in": True, "phone": "(206) 555-1212", "address": "123 Pine St, Seattle, WA",
              "website": "https://example.org/shelter", "notes": "ID preferred; LGBTQ+ inclusive",
              "services": ["shelter", "beds", "night intake"]},
+            {"name": "Aurora Day Center", "type": "Day Center", "neighborhood": "North Seattle",
+             "hours": "8am–6pm daily", "walk_in": True, "phone": "(206) 555-3434",
+             "address": "8600 Aurora Ave N, Seattle, WA", "website": "https://example.org/daycenter",
+             "notes": "Showers, laundry, mail; daytime rest area",
+             "services": ["showers", "laundry", "mail", "hygiene"]},
             {"name": "Harbor Free Clinic", "type": "Clinic", "neighborhood": "Capitol Hill",
              "hours": "Walk-ins Wed/Fri 1–5pm", "walk_in": True, "phone": "(206) 555-4545",
              "address": "500 Broadway E, Seattle, WA", "website": "https://example.org/clinic",
-             "notes": "MAT referrals; naloxone on site", "services": ["medical", "clinic", "mat", "naloxone"]}
+             "notes": "MAT referrals; naloxone on site; primary care triage",
+             "services": ["medical", "clinic", "mat", "naloxone", "referrals"]}
         ]
 
 def expand_query_terms(q: str):
@@ -173,10 +201,6 @@ def services():
 def logged_in():
     return session.get("authed") is True
 
-def require_login():
-    if not logged_in():
-        return redirect(url_for("login"))
-
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -198,7 +222,6 @@ def logout():
 def dashboard():
     if not logged_in():
         return redirect(url_for("login"))
-    # lightweight summaries
     recent_intakes = list(INTAKES)[:50]
     recent_events = list(EVENTS)[:50]
     return render_template("dashboard.html",
@@ -211,14 +234,11 @@ def intake_resolve():
     if not logged_in():
         abort(403)
     iid = request.form.get("id", "")
-    updated = False
     for item in INTAKES:
         if str(item.get("id")) == str(iid):
             item["status"] = "resolved"
-            updated = True
+            log_event("intake_resolved", "case_manager", {"id": iid})
             break
-    if updated:
-        log_event("intake_resolved", "case_manager", {"id": iid})
     return redirect(url_for("dashboard"))
 
 
@@ -279,7 +299,8 @@ def triage():
 # --- Tier 3: Event logging + analytics (no PII) ---
 ALLOWED_EVENT_TYPES = {
     "call_click","website_click","directions_click","copy_address",
-    "search","filter","triage","intake_submitted","intake_resolved","login"
+    "search","filter","triage","intake_submitted","intake_resolved","login",
+    "guided_start","guided_complete","lang_select","contrast_toggle","quick_exit"
 }
 
 def log_event(evt_type: str, name: str, meta: dict):
@@ -313,12 +334,32 @@ def analytics_summary():
         if e["type"] in ("call_click","website_click","directions_click","copy_address"):
             nm = e.get("name","")
             top_services[nm] = top_services.get(nm, 0) + 1
-    return {"counts": counts, "top_services": sorted(top_services.items(), key=lambda x: -x[1])[:10], "events": len(EVENTS), "intakes": len(INTAKES)}
+    return {
+        "counts": counts,
+        "top_services": sorted(top_services.items(), key=lambda x: -x[1])[:10],
+        "events": len(EVENTS),
+        "intakes": len(INTAKES)
+    }
 
 @app.get("/analytics")
 def analytics():
     return jsonify(analytics_summary())
 
+@app.get("/export.csv")
+def export_csv():
+    # unified CSV: a 'dataset' column distinguishes rows
+    buf = io.StringIO()
+    writer = csv.writer(buf)
+    writer.writerow(["dataset","ts","ip","type","name","meta","id","need","details","status","pronouns","contact"])
+    for e in reversed(EVENTS):
+        writer.writerow(["event", e.get("ts",""), e.get("ip",""), e.get("type",""), e.get("name",""),
+                         json.dumps(e.get("meta",{})), "", "", "", "", "", ""])
+    for i in reversed(INTAKES):
+        writer.writerow(["intake", i.get("ts",""), "", "", i.get("name",""), "",
+                         i.get("id",""), i.get("need",""), i.get("details",""),
+                         i.get("status",""), i.get("pronouns",""), i.get("contact","")])
+    return buf.getvalue(), 200, {"Content-Type": "text/csv"}
+    
 
 # ----------------------------- Local sanity tests ------------------------------------
 def test_ai_triage():
@@ -332,6 +373,5 @@ def test_ai_triage():
 if __name__ == "__main__":
     test_ai_triage()
     app.run(host="0.0.0.0", port=5000, debug=False)
-
 
 
